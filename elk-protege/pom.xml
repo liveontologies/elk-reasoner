@@ -85,6 +85,12 @@
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
+			<artifactId>elk-owl-implementation</artifactId>
+			<version>${project.version}</version>		
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>elk-proofs</artifactId>
 			<version>${project.version}</version>
 			<scope>provided</scope>
@@ -93,6 +99,35 @@
 			<groupId>${project.groupId}</groupId>
 			<artifactId>elk-util-common</artifactId>
 			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>elk-util-io</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>elk-util-logging</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>elk-util-concurrent</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>elk-util-collections</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.liveontologies</groupId>
+			<artifactId>owlapi-proof</artifactId>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -114,6 +149,80 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>elk-owlapi4</artifactId>
+			<version>${project.version}</version>
+			<classifier>test-sources</classifier>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>net.sourceforge.owlapi</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>elk-owlapi4</artifactId>
+			<version>${project.version}</version>
+			<classifier>test-resources</classifier>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>net.sourceforge.owlapi</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>elk-owl-implementation</artifactId>
+			<version>${project.version}</version>
+			<type>test-jar</type>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>elk-reasoner</artifactId>
+			<version>${project.version}</version>
+			<type>test-jar</type>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>elk-proofs</artifactId>
+			<version>${project.version}</version>
+			<type>test-jar</type>
+			<scope>test</scope>
+		</dependency>		
+		<dependency>
+			<!-- Needed for classification correctness tests. Expected
+			taxonomies 
+				are loaded using the JavaCC parser. -->
+			<groupId>${project.groupId}</groupId>
+			<artifactId>elk-owl-parsing-javacc</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>elk-util-concurrent</artifactId>
+			<version>${project.version}</version>
+			<type>test-jar</type>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>elk-util-testing</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
@@ -137,6 +246,78 @@
 			</resource>
 		</resources>
 		<plugins>
+			<plugin>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>analyze</id>
+						<configuration>
+							<ignoredUnusedDeclaredDependencies>
+								<usedDependency>${project.groupId}:elk-owlapi4:jar:${project.version}</usedDependency>
+								<usedDependency>${project.groupId}:elk-owl-parsing-javacc</usedDependency>
+								<usedDependency>${project.groupId}:elk-proofs</usedDependency>
+							</ignoredUnusedDeclaredDependencies>
+						</configuration>
+					</execution>
+					<execution>
+						<id>unpack-sources</id>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>${project.groupId}</groupId>
+									<artifactId>elk-owlapi4</artifactId>
+									<version>${project.version}</version>
+									<classifier>test-sources</classifier>
+									<overWrite>false</overWrite>
+									<outputDirectory>${project.build.directory}/test/java</outputDirectory>
+								</artifactItem>
+								<artifactItem>
+									<groupId>${project.groupId}</groupId>
+									<artifactId>elk-owlapi4</artifactId>
+									<version>${project.version}</version>
+									<classifier>test-resources</classifier>
+									<overWrite>false</overWrite>
+									<outputDirectory>${project.build.directory}/test/resources</outputDirectory>
+								</artifactItem>
+							</artifactItems>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>3.0.0</version>
+				<executions>
+					<execution>
+						<id>add-test-source</id>
+						<goals>
+							<goal>add-test-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>${project.build.directory}/test/java</source>
+							</sources>
+						</configuration>
+					</execution>
+					<execution>
+						<id>add-test-resource</id>
+						<goals>
+							<goal>add-test-resource</goal>
+						</goals>
+						<configuration>
+							<resources>
+								<resource>
+									<directory>${project.build.directory}/test/resources</directory>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
