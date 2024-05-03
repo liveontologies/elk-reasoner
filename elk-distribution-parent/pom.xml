@@ -39,7 +39,7 @@
 				<plugin>
 					<!-- the plugin for sharing resources among maven modules and projects -->
 					<artifactId>maven-remote-resources-plugin</artifactId>
-					<version>1.7.0</version>
+					<version>3.1.0</version>
 				</plugin>
 				<plugin>
 					<!-- the plugin used to generate the modified plugin versions, such 
@@ -47,7 +47,6 @@
 						in src/main/update.properties -->
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>build-helper-maven-plugin</artifactId>
-					<version>3.2.0</version>
 					<executions>
 						<execution>
 							<!-- generate the modified plugin versions, such as release.version 

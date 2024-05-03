@@ -98,7 +98,7 @@
 		<!-- try to keep the version low for backward compatibility -->
 		<protege.version>5.5.0</protege.version>
 		<java.required.version>8</java.required.version>
-		<slf4j.version>2.0.12</slf4j.version>
+		<slf4j.version>2.0.13</slf4j.version>
 		<logback.version>1.3.14</logback.version>
 		<elk.wiki>https://github.com/liveontologies/elk-reasoner/wiki</elk.wiki>
 		<protege.update.url>https://raw.githubusercontent.com/liveontologies/elk-reasoner/release/elk-distribution-parent/elk-distribution-protege</protege.update.url>
@@ -228,7 +228,7 @@
 				</plugin>
 				<plugin>
 					<artifactId>maven-gpg-plugin</artifactId>
-					<version>3.2.1</version>
+					<version>3.2.4</version>
 				</plugin>
 				<plugin>
 					<artifactId>maven-install-plugin</artifactId>
@@ -244,7 +244,7 @@
 				</plugin>
 				<plugin>
 					<artifactId>maven-source-plugin</artifactId>
-					<version>3.2.0</version>
+					<version>3.3.1</version>
 				</plugin>
 				<plugin>
 					<artifactId>maven-resources-plugin</artifactId>
@@ -252,11 +252,16 @@
 				</plugin>
 				<plugin>
 					<artifactId>maven-site-plugin</artifactId>
-					<version>3.12.1</version>
+					<version>4.0.0-M13</version>
 				</plugin>
 				<plugin>
 					<artifactId>maven-surefire-plugin</artifactId>
-					<version>3.0.0-M5</version>
+					<version>3.2.5</version>
+				</plugin>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>build-helper-maven-plugin</artifactId>
+					<version>3.4.0</version>
 				</plugin>
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
