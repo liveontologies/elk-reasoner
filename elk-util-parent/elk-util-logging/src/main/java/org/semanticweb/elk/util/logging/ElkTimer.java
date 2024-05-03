@@ -546,8 +546,8 @@ public class ElkTimer {
 	@Override
 	public int hashCode() {
 		int nameHash = name.hashCode();
-		int threadIdHash = new Long(threadId).hashCode();
-		int todoFlagsHash = new Integer(todoFlags).hashCode();
+		int threadIdHash = Long.valueOf(threadId).hashCode();
+		int todoFlagsHash = Integer.valueOf(todoFlags).hashCode();
 		return HashGenerator.combineListHash(nameHash, todoFlagsHash,
 				threadIdHash);
 	}
