@@ -171,7 +171,6 @@
 								<!-- configuration file describing how to create the archive -->
 								<descriptor>${basedir}/src/assembly/protege-zip.xml</descriptor>
 							</descriptors>
-							<classifier>zip</classifier>
 						</configuration>
 					</execution>
 				</executions>

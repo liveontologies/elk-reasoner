@@ -180,7 +180,6 @@
 							<descriptors>
 								<descriptor>${basedir}/src/assembly/cli-zip.xml</descriptor>
 							</descriptors>
-							<classifier>zip</classifier>
 						</configuration>
 					</execution>
 				</executions>
