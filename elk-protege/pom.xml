@@ -376,6 +376,9 @@
 						<extensions>true</extensions>
 						<configuration>
 							<manifestLocation>META-INF</manifestLocation>
+							<instructions>
+								<Bundle-ClassPath>target/dependency,.</Bundle-ClassPath>
+							</instructions>
 						</configuration>
 					</plugin>
 					<plugin>
@@ -391,16 +394,6 @@
 						</executions>
 						<configuration>
 							<includeScope>provided</includeScope>
-						</configuration>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.felix</groupId>
-						<artifactId>maven-bundle-plugin</artifactId>
-						<extensions>true</extensions>
-						<configuration>
-							<instructions>
-								<Bundle-ClassPath>target/dependency,.</Bundle-ClassPath>
-							</instructions>
 						</configuration>
 					</plugin>
 				</plugins>
