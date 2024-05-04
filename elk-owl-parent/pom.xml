@@ -3,8 +3,8 @@
 
 	<parent>
 		<artifactId>elk-parent</artifactId>
-		<groupId>org.semanticweb.elk</groupId>
-		<version>0.5.0-SNAPSHOT</version>
+		<groupId>com.github.liveontologies</groupId>
+		<version>0.6.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>elk-owl-parent</artifactId>
