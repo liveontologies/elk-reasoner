@@ -35,7 +35,7 @@
 			<filtered>true</filtered>
 		</file>
 		<file>
-			<source>${basedir}/target/maven-shared-archive-resources/README.txt</source>
+			<source>${basedir}/src/main/resources/README.txt</source>
 			<filtered>true</filtered>
 		</file>
 		<file>

@@ -93,8 +93,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<owlapi4.version>4.5.26</owlapi4.version>
-		<owlapi5.version>5.1.20</owlapi5.version>
+		<owlapi.version>5.1.20</owlapi.version>
 		<protege-proof-explanation.version>0.1.0</protege-proof-explanation.version>
 		<!-- try to keep the version low for backward compatibility -->
 		<protege.version>5.5.0</protege.version>
@@ -358,11 +357,11 @@
 		<module>elk-cli</module>
 		<module>elk-distribution-parent</module>
 		<module>elk-ore-parent</module>
-		<module>elk-owl-parent</module>
+		<module>elk-owlapi</module>
+		<module>elk-owl-parent</module>		
 		<module>elk-proofs</module>
 		<module>elk-reasoner</module>
 		<module>elk-util-parent</module>
-		<module>elk-owlapi-parent</module>
 	</modules>
 
 	<profiles>

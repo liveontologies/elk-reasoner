@@ -17,21 +17,9 @@
 	<modules>
 		<module>elk-distribution-resources</module>
 		<module>elk-distribution-cli</module>
-		<module>elk-distribution-owlapi-parent</module>
+		<module>elk-distribution-owlapi</module>
+		<module>elk-distribution-protege</module>
 	</modules>
-
-
-	<profiles>
-		<profile>
-			<id>java-8+</id>
-			<activation>
-				<jdk>[1.8,)</jdk>
-			</activation>
-			<modules>
-				<module>elk-distribution-protege</module>
-			</modules>
-		</profile>
-	</profiles>
 
 	<dependencyManagement>
 		<dependencies>

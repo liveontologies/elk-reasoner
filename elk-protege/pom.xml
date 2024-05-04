@@ -61,7 +61,7 @@
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>elk-owlapi4</artifactId>
+			<artifactId>elk-owlapi</artifactId>
 			<version>${project.version}</version>
 			<scope>provided</scope>
 			<exclusions>
@@ -152,7 +152,7 @@
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>elk-owlapi4</artifactId>
+			<artifactId>elk-owlapi</artifactId>
 			<version>${project.version}</version>
 			<classifier>test-sources</classifier>
 			<scope>test</scope>
@@ -165,7 +165,7 @@
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>elk-owlapi4</artifactId>
+			<artifactId>elk-owlapi</artifactId>
 			<version>${project.version}</version>
 			<classifier>test-resources</classifier>
 			<scope>test</scope>
@@ -253,7 +253,7 @@
 						<id>analyze</id>
 						<configuration>
 							<ignoredUnusedDeclaredDependencies>
-								<usedDependency>${project.groupId}:elk-owlapi4:jar:${project.version}</usedDependency>
+								<usedDependency>${project.groupId}:elk-owlapi:jar:${project.version}</usedDependency>
 								<usedDependency>${project.groupId}:elk-owl-parsing-javacc</usedDependency>
 								<usedDependency>${project.groupId}:elk-proofs</usedDependency>
 							</ignoredUnusedDeclaredDependencies>
@@ -268,7 +268,7 @@
 							<artifactItems>
 								<artifactItem>
 									<groupId>${project.groupId}</groupId>
-									<artifactId>elk-owlapi4</artifactId>
+									<artifactId>elk-owlapi</artifactId>
 									<version>${project.version}</version>
 									<classifier>test-sources</classifier>
 									<overWrite>false</overWrite>
@@ -276,7 +276,7 @@
 								</artifactItem>
 								<artifactItem>
 									<groupId>${project.groupId}</groupId>
-									<artifactId>elk-owlapi4</artifactId>
+									<artifactId>elk-owlapi</artifactId>
 									<version>${project.version}</version>
 									<classifier>test-resources</classifier>
 									<overWrite>false</overWrite>
