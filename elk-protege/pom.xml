@@ -23,6 +23,27 @@
 		<protege.upper.version>6</protege.upper.version>
 	</properties>
 
+	<dependencyManagement>
+		<dependencies>
+			<!-- Import versions of dependencies from Protege -->
+			<dependency>
+				<groupId>edu.stanford.protege</groupId>
+				<artifactId>protege-parent</artifactId>
+				<version>${protege.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<!-- Remaining dependencies use the default versions -->
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>elk-bom</artifactId>
+				<version>${project.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
 	<dependencies>
 		<dependency>
 			<groupId>edu.stanford.protege</groupId>
@@ -37,7 +58,6 @@
 		<dependency>
 			<groupId>net.sourceforge.owlapi</groupId>
 			<artifactId>owlapi-osgidistribution</artifactId>
-			<version>${owlapi4.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
