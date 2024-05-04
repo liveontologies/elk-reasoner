@@ -23,7 +23,7 @@ install: mvn install $OPTIONS -DskipTests=true
 script: mvn test -Dassembly.skipAssembly=true -B
 
 after_success:
-  - test "$DEPLOY" = true -a "$TRAVIS_PULL_REQUEST" = false -a "$TRAVIS_BRANCH" = master
+  - test "$DEPLOY" = true -a "$TRAVIS_PULL_REQUEST" = false -a "$TRAVIS_BRANCH" = main
     && mvn deploy --settings .ci-settings.xml -DskipTests=true -B
 
 env:
