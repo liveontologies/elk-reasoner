@@ -133,11 +133,7 @@
 	</reporting>
 
 	<distributionManagement>
-		<downloadUrl>https://github.com/liveontologies/elk-reasoner/releases</downloadUrl>
-		<site>
-			<id>elk.semanticweb.org</id>
-			<url>scp://elk.semanticweb.org/home/elkuser/elk_semanticweb_org/www/maven/${project.version}</url>
-		</site>
+		<downloadUrl>https://github.com/liveontologies/${project.artifactId}/releases</downloadUrl>
 		<snapshotRepository>
 			<id>ossrh</id>
 			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
@@ -146,7 +142,7 @@
 
 	<issueManagement>
 		<system>GitHub</system>
-		<url>https://github.com/liveontologies/elk-reasoner/issues/</url>
+		<url>https://github.com/liveontologies/${project.artifactId}/issues/</url>
 	</issueManagement>
 
 	<mailingLists>
@@ -195,24 +191,8 @@
 					<version>3.1.1</version>
 				</plugin>
 				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-enforcer-plugin</artifactId>
 					<version>3.4.1</version>
-					<executions>
-						<execution>
-							<id>enforce-maven</id>
-							<goals>
-								<goal>enforce</goal>
-							</goals>
-							<configuration>
-								<rules>
-									<requireMavenVersion>
-										<version>3.5.4</version>
-									</requireMavenVersion>
-								</rules>
-							</configuration>
-						</execution>
-					</executions>
 				</plugin>
 				<plugin>
 					<artifactId>maven-gpg-plugin</artifactId>
@@ -254,40 +234,58 @@
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>license-maven-plugin</artifactId>
-					<version>2.3.0</version>
-					<configuration>
-						<verbose>false</verbose>
-						<addSvnKeyWords>true</addSvnKeyWords>
-						<extraExtensions>
-							<g>java</g>
-							<jj>java</jj>
-						</extraExtensions>
-					</configuration>
-					<executions>
-						<execution>
-							<id>first</id>
-							<goals>
-								<goal>update-file-header</goal>
-								<goal>update-project-license</goal>
-							</goals>
-							<phase>package</phase>
-							<configuration>
-								<licenseName>apache_v2</licenseName>
-								<roots>
-									<root>src/main/java</root>
-									<root>src/test/java</root>
-								</roots>
-							</configuration>
-						</execution>
-					</executions>
+					<version>2.3.0</version>					
 				</plugin>
 			</plugins>
 		</pluginManagement>
 		
 		<plugins>
 			<plugin>
+				<artifactId>maven-enforcer-plugin</artifactId>			
+				<executions>
+					<execution>
+						<id>enforce-maven</id>
+						<goals>
+							<goal>enforce</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<requireMavenVersion>
+									<version>3.5.4</version>
+								</requireMavenVersion>
+							</rules>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>license-maven-plugin</artifactId>
+				<configuration>
+					<verbose>false</verbose>
+					<addSvnKeyWords>true</addSvnKeyWords>
+					<extraExtensions>
+						<g>java</g>
+						<jj>java</jj>
+					</extraExtensions>
+				</configuration>
+				<executions>
+					<execution>
+						<id>first</id>
+						<goals>
+							<goal>update-file-header</goal>
+							<goal>update-project-license</goal>
+						</goals>
+						<phase>package</phase>
+						<configuration>
+							<licenseName>apache_v2</licenseName>
+							<roots>
+								<root>src/main/java</root>
+								<root>src/test/java</root>
+							</roots>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 			<!-- making sure that the sources are always installed so that sources 
 				are included in elk-distribution -->
