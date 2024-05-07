@@ -20,7 +20,7 @@ matrix:
 install:
   - bash -c "mkdir -p $HOME/.m2"
 build_script:
-  - mvn install -DskipTests=true -U -B
+  - mvn install --settings .ci-settings.xml -DskipTests=true -U -B
 test_script:
   - mvn test -Dassembly.skipAssembly=true -B
 deploy_script:
