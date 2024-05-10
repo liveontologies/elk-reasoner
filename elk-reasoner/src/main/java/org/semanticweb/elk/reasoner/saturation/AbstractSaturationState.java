@@ -257,10 +257,6 @@ public abstract class AbstractSaturationState<EC extends ExtendedContext>
 		resetContexts();
 		activeContexts_.clear();
 		notSaturatedContexts_.clear();
-		contextSetNonSaturatedUpper_.set(0);
-		contextSetNonSaturatedLower_.set(0);
-		contextSetSaturatedUpper_.set(0);
-		contextSetSaturatedLower_.set(0);
 	}
 
 	/**
