@@ -101,7 +101,7 @@
 		<slf4j.version>2.0.13</slf4j.version>
 		<logback.version>1.3.14</logback.version>
 		<elk.wiki>https://github.com/liveontologies/elk-reasoner/wiki</elk.wiki>
-		<protege.update.url>https://raw.githubusercontent.com/liveontologies/elk-reasoner/release/elk-distribution-parent/elk-distribution-protege</protege.update.url>
+		<protege.update.url>https://raw.githubusercontent.com/liveontologies/elk-reasoner/release/${project.parent.artifactId}/${project.artifactId}</protege.update.url>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     	<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
