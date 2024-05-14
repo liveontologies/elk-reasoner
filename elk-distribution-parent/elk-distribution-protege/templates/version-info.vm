@@ -88,7 +88,6 @@ Changes:
 #end
 #end
 #if ($release.getActions('remove').size() !=0)
-
 Removed:
 #foreach($actionItem in $release.getActions('remove'))
 #set($action=$actionItem.getAction())
