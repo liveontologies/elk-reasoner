@@ -16,6 +16,120 @@ will appear in the produced result.
 	</properties>
 	<body>
 	    <release version="${release.version}" date="${buildDate}" description="Changes since the last release">
+			<action dev="pavel" type="add">
+				Compute internal inferences for derived conclusions by repeating rule applications (tracing).				
+			</action>
+			<action dev="yevgeny" type="update">
+				Avoid performing some redundant role chain rule applications.				
+			</action>
+			<action dev="pavel" type="add">
+				Initial translation of internal ELK inferences to OWL inferences.				
+			</action>
+			<action dev="yevgeny" type="update">
+				Ensure that the set of derived conclusions does not depend on the order of rule applications.				
+			</action>
+			<action dev="yevgeny" type="update">
+				Make index updates revertable to better handle unsupported language features.				
+			</action>
+			<action dev="yevgeny" type="update">
+				Represent all OWL object types in internal OWL object model.				
+			</action>			
+			<action dev="yevgeny" type="update">
+				Improve the transitive reduction algorithm for taxonomy construction.				
+			</action>
+			<action dev="yevgeny" type="remove">
+				Protege: incremental mode is no longer experimental.				
+			</action>
+			<action dev="yevgeny" type="add">
+				Protege: new auto-synchronization option to update reasoning result immediately after changes.				
+			</action>
+			<action dev="yevgeny" type="update">
+				Protege: store preferences in Java preferences instead of a file.				
+			</action>
+			<action dev="yevgeny" type="add">
+				Partial support of ObjectOneOf constructor.				
+			</action>
+			<action dev="yevgeny" type="add">
+				Support of SameIndividual and DifferentIndividuals axioms.				
+			</action>
+			<action dev="yevgeny" type="add">
+				Partial support of DisjointUnion axioms.				
+			</action>
+			<action dev="yevgeny" type="add">
+				Partial support of ObjectPropertyRange axioms.				
+			</action>
+			<action dev="petesko" type="update">
+				Make taxonomy model more generic.				
+			</action>
+			<action dev="yevgeny" type="update">
+				Convert internal inferences to OWL inferences using a recursive matching procedure.				
+			</action>
+			<action dev="petesko" type="update">
+				Implement answering class expression and instance queries without introducing auxiliary classes.				
+			</action>
+			<action dev="petesko" type="add">
+				Support entailment checking for ClassAssertion, DifferentIndividuals, DisjointClasses, EquivalentClasses, ObjectPropertyAssertion, ObjectPropertyDomain, SameIndividual and SubClassOf axioms.				
+			</action>
+			<action dev="petesko" type="update">
+				Extend proof generation to entailment checking.				
+			</action>
+			<action dev="yevgeny" type="add">
+				Implement extension points for the protege-proof-explanation plugin.				
+			</action>
+			<action dev="yevgeny" type="update">
+				Add an option to inline proofs by combining nested inferences.				
+			</action>
+			<action dev="yevgeny" type="update">
+				Add examples to inferences used in proofs.				
+			</action>
+			<action dev="petesko" type="update">
+				Centralize interrupt management for all reasoning stages.				
+			</action>
+			<action dev="yevgeny" type="update">
+				Share concurrent executor over all reasoner instances.				
+			</action>
+			<action dev="yevgeny" type="remove">
+				Drop support of Java 7.				
+			</action>
+			<action dev="saa" type="add">
+				Implement extension points for the protege-proof-justification plugin.				
+			</action>			
+			<action dev="petesko" type="update">
+				Implement recency and frequency caching policies.				
+			</action>
+			<action dev="petesko" type="update">
+				Cache query results and proof inferences.				
+			</action>
+			<action dev="yevgeny" type="fix" issue="43">
+				Parse DataOneOf with one literal by functional-style parser.				
+			</action>
+			<action dev="petesko" type="add">
+				Keep track of features that cause incompleteness of reasoning results.				
+			</action>
+			<action dev="yevgeny" type="remove">
+				Protege: remove popup notifications about unsupported reasoning tasks and incompleteness.				
+			</action>			
+			<action dev="yevgeny" type="fix" issue="49">
+				Fix NumberFormatException when returning reasoner version.				
+			</action>
+			<action dev="yevgeny" type="update">
+				Improve reporting of incompleteness warnings and their explanations.				
+			</action>
+			<action dev="yevgeny" type="add">
+				Support positive occurrences of ObjectHasSelf.				
+			</action>
+			<action dev="yevgeny" type="fix" issue="61">
+				Restore equality detection of some unsupported constructors.				
+			</action>
+			<action dev="yevgeny" type="update" issue="28">
+				Improve incremental reasoning by avoiding re-computations after deletions.				
+			</action>
+			<action dev="yevgeny" type="update">
+				Switch from log4j to logback.				
+			</action>
+			<action dev="yevgeny" type="add" issue="48">
+				Support OWL API 5.x.				
+			</action>			
 		</release>
 		<release version="0.4.3" date="2016-01-11" description="Third maintenance relase after the fourth public release">
 			<action dev="petesko" type="update">
