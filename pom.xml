@@ -89,6 +89,11 @@
 			</roles>
 			<timezone>1</timezone>
 		</developer>
+		<developer>
+			<id>saa</id>
+			<name>Alexander Stupnikov</name>
+			<email>saarus72@gmail.com</email>
+		</developer>
 	</developers>
 
 	<properties>
