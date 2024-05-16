@@ -35,6 +35,7 @@ import org.semanticweb.elk.reasoner.tracing.ConclusionBaseFactory;
  * @author Yevgeny Kazakov
  *
  * @param <O>
+ *            the type of the output of the visitor
  */
 public class SubPropertyChainInferenceConclusionVisitor<O>
 		implements SubPropertyChainInference.Visitor<O> {

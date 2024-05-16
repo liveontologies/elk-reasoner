@@ -26,7 +26,6 @@ package org.semanticweb.elk.util.collections;
  * 
  * @param <T>
  *            the type of elements which can be used with this condition
- * 
  */
 public interface Condition<T> {
 	/**

@@ -32,7 +32,7 @@ import org.semanticweb.elk.owl.visitors.ElkEquivalentObjectPropertiesAxiomVisito
 /**
  * Corresponds to an
  * <a href= "http://www.w3.org/TR/owl2-syntax/#Equivalent_Object_Properties">
- * Equivalent Object Properties Axiom<a> in the OWL 2 specification.
+ * Equivalent Object Properties Axiom</a> in the OWL 2 specification.
  * 
  * @author Markus Kroetzsch
  */
@@ -53,6 +53,8 @@ public interface ElkEquivalentObjectPropertiesAxiom
 	 * 
 	 * @param visitor
 	 *            the visitor that can work with this axiom type
+	 * @param <O>
+	 *            the type of the output of the visitor
 	 * @return the output of the visitor
 	 */
 	public abstract <O> O accept(

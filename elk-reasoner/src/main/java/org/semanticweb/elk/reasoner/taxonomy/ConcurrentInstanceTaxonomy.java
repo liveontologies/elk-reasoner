@@ -133,11 +133,13 @@ public class ConcurrentInstanceTaxonomy
 	}
 
 	/**
-	 * Obtain a {@link TypeNode} object for a given {@link ElkClass}, or
-	 * {@code null} if none assigned.
+	 * Obtain a {@link TypeNode} object for a given {@link ElkNamedIndividual},
+	 * or {@code null} if none assigned.
 	 * 
 	 * @param individual
-	 * @return instance node object for elkClass, possibly still incomplete
+	 *            the {@link ElkNamedIndividual} for which to retrieve the
+	 *            {@link TypeNode}
+	 * @return instance node object for {@link ElkNamedIndividual}, possibly still incomplete
 	 */
 	@Override
 	public IndividualNode.Projection<ElkClass, ElkNamedIndividual> getInstanceNode(

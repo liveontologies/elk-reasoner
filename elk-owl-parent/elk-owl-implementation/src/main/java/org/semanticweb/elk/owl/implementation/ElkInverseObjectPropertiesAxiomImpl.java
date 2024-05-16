@@ -35,7 +35,7 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 /**
  * Corresponds to an <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Inverse_Object_Properties_2">Inverse
- * Object Properties Axiom<a> in the OWL 2 specification.
+ * Object Properties Axiom</a> in the OWL 2 specification.
  * 
  * @author Markus Kroetzsch
  * 

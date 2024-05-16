@@ -30,7 +30,7 @@ import org.semanticweb.elk.owl.visitors.ElkClassAxiomVisitor;
 /**
  * Corresponds to a
  * <a href= "http://www.w3.org/TR/owl2-syntax/#Class_Expression_Axioms">Class
- * Expression Axiom<a> in the OWL 2 specification.
+ * Expression Axiom</a> in the OWL 2 specification.
  * 
  * @author Markus Kroetzsch
  */
@@ -41,6 +41,8 @@ public interface ElkClassAxiom extends ElkAxiom {
 	 * 
 	 * @param visitor
 	 *            the visitor that can work with this axiom type
+	 * @param <O>
+	 *            the type of the output of the visitor
 	 * @return the output of the visitor
 	 */
 	public <O> O accept(ElkClassAxiomVisitor<O> visitor);

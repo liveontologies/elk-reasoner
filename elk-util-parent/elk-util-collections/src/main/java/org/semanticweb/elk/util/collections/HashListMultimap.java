@@ -32,9 +32,10 @@ import java.util.Collection;
  * @author Frantisek Simancik
  * 
  * @param <Key>
+ *            the keys of the multimap
  * @param <Value>
+ *            the values of the multimap
  */
-
 public class HashListMultimap<Key, Value> extends
 		AbstractHashMultimap<Key, Value> {
 

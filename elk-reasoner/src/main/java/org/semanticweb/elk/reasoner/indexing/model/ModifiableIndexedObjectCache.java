@@ -57,6 +57,9 @@ public interface ModifiableIndexedObjectCache extends IndexedObjectCache {
 	 * Returns an object structurally equal to the given occurring in this
 	 * {@link IndexedObjectCache}
 	 * 
+	 * @param <T>
+	 *            the type of the objects to be resolved
+	 * 
 	 * @param input
 	 *            the {@link StructuralIndexedSubObject} to be resolved
 	 * @return an {@link IndexedSubObject} that is structurally equal to the

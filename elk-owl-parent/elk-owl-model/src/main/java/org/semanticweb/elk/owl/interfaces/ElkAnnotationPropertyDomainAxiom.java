@@ -31,7 +31,7 @@ import org.semanticweb.elk.owl.visitors.ElkAnnotationPropertyDomainAxiomVisitor;
 /**
  * Corresponds to an
  * <a href= "http://www.w3.org/TR/owl2-syntax/#Annotation_Property_Domain">
- * Annotation Property Domain<a> in the OWL 2 specification.
+ * Annotation Property Domain</a> in the OWL 2 specification.
  * 
  * @author Markus Kroetzsch
  * @author "Yevgeny Kazakov"
@@ -44,6 +44,8 @@ public interface ElkAnnotationPropertyDomainAxiom extends ElkAnnotationAxiom,
 	 * 
 	 * @param visitor
 	 *            the visitor that can work with this axiom type
+	 * @param <O>
+	 *            the type of the output of the visitor
 	 * @return the output of the visitor
 	 */
 	public <O> O accept(ElkAnnotationPropertyDomainAxiomVisitor<O> visitor);

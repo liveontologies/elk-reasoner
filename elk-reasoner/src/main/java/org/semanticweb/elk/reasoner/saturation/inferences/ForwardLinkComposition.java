@@ -40,12 +40,12 @@ import org.semanticweb.elk.reasoner.tracing.Conclusion.Factory;
  * {@link BackwardLink}, {@link SubPropertyChain}, {@link ForwardLink}, and a
  * {@link SubPropertyChain}:<br>
  * 
- * <pre>
+ * <pre>{@code
  *   (1)             (2)       (3)           (4)
  *  C ⊑ <∃R1>.[D]  R1 ⊑ R2  [D] ⊑ <∃P1>.E  P1 ⊑ P2
  * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
  *                  [C] ⊑ <∃R2P2>.E
- * </pre>
+ * }</pre>
  * 
  * The parameters can be obtained as follows:<br>
  * 

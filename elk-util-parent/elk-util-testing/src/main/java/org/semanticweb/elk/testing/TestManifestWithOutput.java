@@ -39,7 +39,7 @@ public interface TestManifestWithOutput<I extends TestInput, O>
 		extends TestManifest<I> {
 
 	/**
-	 * @return The expected output.
+	 * @return The expected output of the test.
 	 */
 	public O getExpectedOutput();
 
@@ -47,7 +47,9 @@ public interface TestManifestWithOutput<I extends TestInput, O>
 	 * Compares {@link #getExpectedOutput()} and the provided actual output.
 	 * 
 	 * @param actualOutput
+	 *            the actual output that was returned by the test
 	 * @throws TestResultComparisonException
+	 *             if the actual output does not match the expected output
 	 */
 	public void compare(O actualOutput) throws TestResultComparisonException;
 

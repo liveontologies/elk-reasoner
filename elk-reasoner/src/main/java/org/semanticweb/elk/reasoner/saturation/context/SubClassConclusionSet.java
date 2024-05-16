@@ -33,7 +33,7 @@ public interface SubClassConclusionSet {
 	 * @param conclusion
 	 *            the {@link SubClassConclusion} to be added
 	 * @return {@code true} if this {@link SubClassConclusion} has changed as a
-	 *         result of this operation and {@link false} otherwise
+	 *         result of this operation and {@code false} otherwise
 	 */
 	boolean addSubConclusion(SubClassConclusion conclusion);
 
@@ -44,7 +44,7 @@ public interface SubClassConclusionSet {
 	 * @param conclusion
 	 *            the {@link SubClassConclusion} to be removed
 	 * @return {@code true} if this {@link SubClassConclusion} has changed as a
-	 *         result of this operation and {@link false} otherwise
+	 *         result of this operation and {code false} otherwise
 	 */
 	boolean removeSubConclusion(SubClassConclusion conclusion);
 

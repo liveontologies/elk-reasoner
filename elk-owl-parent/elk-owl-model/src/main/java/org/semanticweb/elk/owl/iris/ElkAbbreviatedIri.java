@@ -86,6 +86,8 @@ public class ElkAbbreviatedIri extends ElkIri {
 	 * 
 	 * @param visitor
 	 *            the visitor that can work with this object type
+	 * @param <O>
+ *            the output type of the visitor           
 	 * @return the output of the visitor
 	 */
 	public <O> O accept(ElkAbbreviatedIriVisitor<O> visitor) {

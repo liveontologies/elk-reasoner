@@ -32,7 +32,10 @@ public interface TracingJobListener {
 	 * the inferences in the {@link ModifiableTracingProof}.
 	 * 
 	 * @param context
+	 *            the {@link IndexedContextRoot} which was finished processing
 	 * @param proof
+	 *            the {@link ModifiableTracingProof} in which the new inferences
+	 *            are produced
 	 */
 	public void notifyJobFinished(final IndexedContextRoot context,
 			ModifiableTracingProof<ClassInference> proof);

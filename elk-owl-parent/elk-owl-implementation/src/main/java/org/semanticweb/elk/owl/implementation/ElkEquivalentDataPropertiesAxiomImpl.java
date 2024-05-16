@@ -34,7 +34,7 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 /**
  * Corresponds to an <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Equivalent_Data_Properties">Equivalent
- * Data Properties Axiom<a> in the OWL 2 specification.
+ * Data Properties Axiom</a> in the OWL 2 specification.
  * 
  * @author Markus Kroetzsch
  */

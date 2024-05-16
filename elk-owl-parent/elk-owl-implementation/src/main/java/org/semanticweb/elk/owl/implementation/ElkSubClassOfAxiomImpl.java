@@ -34,7 +34,7 @@ import org.semanticweb.elk.owl.visitors.ElkSubClassOfAxiomVisitor;
 
 /**
  * Corresponds to a <a href=
- * "http://www.w3.org/TR/owl2-syntax/#Subclass_Axioms">Subclass Axiom<a> in the
+ * "http://www.w3.org/TR/owl2-syntax/#Subclass_Axioms">Subclass Axiom</a> in the
  * OWL 2 specification.
  * 
  * @author Yevgeny Kazakov

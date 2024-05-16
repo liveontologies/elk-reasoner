@@ -42,7 +42,10 @@ public interface ContextCreatingSaturationStateWriter<C extends Context>
 	/**
 	 * 
 	 * @param root
-	 * @return the context with the given root
+	 *            the {@link IndexedContextRoot} for which to retrieve or create
+	 *            the corresponding {@link Context}
+	 * @return the {@link Context} with the given root
+	 * @see Context#getRoot()
 	 */
 	public C getCreateContext(IndexedContextRoot root);
 }

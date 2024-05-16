@@ -27,7 +27,7 @@ import org.semanticweb.elk.owl.visitors.ElkSubAnnotationPropertyOfAxiomVisitor;
 /**
  * Corresponds to an
  * <a href= "http://www.w3.org/TR/owl2-syntax/#Annotation_Subproperties">
- * Annotation Subproperty Axiom<a> in the OWL 2 specification.
+ * Annotation Subproperty Axiom</a> in the OWL 2 specification.
  * 
  * @author Frantisek Simancik
  *
@@ -53,6 +53,8 @@ public interface ElkSubAnnotationPropertyOfAxiom extends ElkAnnotationAxiom {
 	 * 
 	 * @param visitor
 	 *            the visitor that can work with this axiom type
+	 * @param <O>
+	 *            the type of the output of the visitor
 	 * @return the output of the visitor
 	 */
 	public <O> O accept(ElkSubAnnotationPropertyOfAxiomVisitor<O> visitor);

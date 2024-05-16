@@ -30,7 +30,7 @@ import org.semanticweb.elk.owl.visitors.ElkObjectHasValueVisitor;
 /**
  * Corresponds to an
  * <a href= "http://www.w3.org/TR/owl2-syntax/#Individual_Value_Restriction">
- * Individual Value Restriction for Object Properties<a> in the OWL 2
+ * Individual Value Restriction for Object Properties</a> in the OWL 2
  * specification.
  * 
  * @author Markus Kroetzsch
@@ -43,6 +43,8 @@ public interface ElkObjectHasValue extends
 	 * 
 	 * @param visitor
 	 *            the visitor that can work with this object type
+	 * @param <O>
+	 *            the type of the output of the visitor
 	 * @return the output of the visitor
 	 */
 	public <O> O accept(ElkObjectHasValueVisitor<O> visitor);

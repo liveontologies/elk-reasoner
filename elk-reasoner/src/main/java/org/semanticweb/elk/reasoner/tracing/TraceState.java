@@ -189,6 +189,7 @@ public class TraceState
 	 * Requests inferences of a {@link Conclusion}.
 	 * 
 	 * @param conclusion
+	 *            the {@link Conclusion} for which to request the inferences
 	 * @return {@code true} if they are ready and can be retrieved by
 	 *         {@link #getInferences(Object)}, returns {@code false} if the
 	 *         tracing stage needs to be run before the inferences can be

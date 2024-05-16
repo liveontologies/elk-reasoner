@@ -134,6 +134,8 @@ public class Operations {
 	 * 
 	 * @param inputs
 	 *            the {@link Iterable} of {@link Iterable}s to be concatenated
+	 * @param <T>
+	 *            the type of elements of {@link Iterable}s
 	 * @return {@link Iterable} consisting of all elements found in input
 	 *         {@link Iterable}s
 	 */
@@ -191,8 +193,11 @@ public class Operations {
 
 	/**
 	 * @param <T>
+	 *            the type of elements of iterators
 	 * @param first
+	 *            the elements that should come first
 	 * @param second
+	 *            the elements that should come next
 	 * @return an iterator that iterates that advances the two given iterators
 	 *         at the same time and returns the values of the second iterator
 	 */
@@ -219,9 +224,11 @@ public class Operations {
 	/**
 	 * Splits the input {@link Iterable} on batches with at most given number of
 	 * elements.
-	 * 
+	 *  
 	 * @param elements
 	 *            the {@link Iterable} to be split
+	 * @param <T>
+	 *            the type of elements in the {@link Iterable}
 	 * @param batchSize
 	 *            the maximal number of elements in batches
 	 * @return a {@link Iterable} of batches containing elements from the input
@@ -272,6 +279,8 @@ public class Operations {
 	 * 
 	 * @param elements
 	 *            the {@link Collection} to be split
+	 * @param <T>
+	 *            the type of elements in the {@link Collection}           
 	 * @param batchSize
 	 *            the maximal number of elements in batches
 	 * @return a {@link Collection} of batches containing elements from the
@@ -313,14 +322,15 @@ public class Operations {
 	}
 
 	/**
-	 * 
+	 * @param <T>
+	 *            the type of elements
 	 * @param input
-	 *            the input iterator
+	 *            the input iterator over these elements
 	 * @param condition
 	 *            the condition used for filtering
 	 * @return the filtered iterator
 	 * 
-	 */
+	 */	
 	public static <T> Iterable<T> filter(final Iterable<? extends T> input,
 			final Condition<? super T> condition) {
 		assert input != null;
@@ -384,6 +394,8 @@ public class Operations {
 	 * Returns read-only view of the given set consisting of the elements
 	 * satisfying a given condition, if the number of such elements is known
 	 * 
+	 * @param <T>
+	 *            the type of elements
 	 * @param input
 	 *            the given set to be filtered
 	 * @param condition
@@ -524,6 +536,10 @@ public class Operations {
 	 * if the transformation returns {@code null}, it is not included in the
 	 * output
 	 * 
+	 * @param <I>
+	 *            the type of input of elements
+	 * @param <O>
+	 *            the type of output elements
 	 * @param input
 	 *            the input elements
 	 * @param transformation
@@ -702,11 +718,20 @@ public class Operations {
 	 * the second {@link Multimap} using the given {@link Writer} and prefixing
 	 * all messages with a given prefix.
 	 * 
+	 * @param <K>
+	 *            the type of the keys of the {@link Multimap}
+	 * @param <V>
+	 *            the type of the values of the {@link Multimap}
 	 * @param first
+	 *            the entries that should be printed
 	 * @param second
+	 *            the entries that should be skipped
 	 * @param writer
+	 *            the writer using which the entries should be printed
 	 * @param prefix
+	 *            the string to be appended to every line
 	 * @throws IOException
+	 *             if any I/O error occurs
 	 */
 	public static <K, V> void dumpDiff(Multimap<K, V> first,
 			Multimap<K, V> second, Writer writer, String prefix)
@@ -724,11 +749,18 @@ public class Operations {
 	 * the second {@link Collection} using the given {@link Writer} and
 	 * prefixing all messages with a given prefix.
 	 * 
+	 * @param <T>
+	 *            the type of elements
 	 * @param first
+	 *            the elements to be printed
 	 * @param second
+	 *            the elements to be skipped
 	 * @param writer
+	 *            the writer using which the elements should be printed
 	 * @param prefix
+	 *            the string to be appended to every line
 	 * @throws IOException
+	 *             if any I/O error occurs
 	 */
 	public static <T> void dumpDiff(Collection<T> first, Collection<T> second,
 			Writer writer, String prefix) throws IOException {
@@ -743,9 +775,11 @@ public class Operations {
 	 * @author Pavel Klinov
 	 * 
 	 *         pavel.klinov@uni-ulm.de
-	 *         
-	 * @param <I> 
-	 * @param <O> 
+	 * 
+	 * @param <I>
+	 *            the type of input objects
+	 * @param <O>
+	 *            the type of the output objects
 	 */
 	public interface Functor<I, O> {
 
@@ -758,8 +792,10 @@ public class Operations {
 	 * @author Pavel Klinov
 	 *
 	 *         pavel.klinov@uni-ulm.de
-	 * @param <I> 
-	 * @param <O> 
+	 * @param <I>
+	 *            the type of input objects
+	 * @param <O>
+	 *            the type of output objects
 	 */
 	public interface FunctorEx<I, O> extends Functor<I, O> {
 
@@ -768,17 +804,26 @@ public class Operations {
 		 * because it's primarily used for an efficient implementation of
 		 * {@link Set#contains(Object)}, which takes an Object
 		 * 
-		 * @param element 
+		 * @param element
+		 *            the output element to be converted back to input
+		 * 
 		 * @return Can return null if the transformation is not possible
 		 */
 		public I deapply(Object element);
 	}
 
 	/**
+	 * An {@link Iterator} whose elements are obtained from another
+	 * {@link Iterator} by applying a {@link Functor}
 	 * 
 	 * @author Pavel Klinov
 	 *
 	 *         pavel.klinov@uni-ulm.de
+	 * 
+	 * @param <I>
+	 *            the type of elements of the input {@link Iterator}
+	 * @param <O>
+	 *            the type of elements of this {@link Iterator}
 	 */
 	private static class MapIterator<I, O> implements Iterator<O> {
 
@@ -808,12 +853,18 @@ public class Operations {
 	}
 
 	/**
-	 * A simple second-order map function for sets
+	 * A simple second-order map function for {@link Set}s
 	 * 
+	 * @param <I>
+	 *            the type of elements of the input {@link Set}
+	 * @param <O>
+	 *            the type of elements of this {@link Set}
 	 * @param input
+	 *            the input {@link Set} to be converted
 	 * @param functor
-	 * @return a set which contains the results of applying the functor to the
-	 *         elements in the input set
+	 *            the {@link Functor} that applies to the input elements
+	 * @return a set which contains the results of applying the {@link Functor} to the
+	 *         elements in the input {@link Set}
 	 */
 	public static <I, O> Set<O> map(final Set<? extends I> input,
 			final FunctorEx<I, O> functor) {
@@ -861,10 +912,13 @@ public class Operations {
 	}
 
 	/**
+	 * @param <T>
+	 *            the type of elements
 	 * @param elementComparator
-	 * @return {@link Comparator} that compares iterables according to lexical
-	 *         order w.r.t. element ordering defined by the provided element
-	 *         {@link Comparator}.
+	 *            a {@link Comparator} on these elements
+	 * @return {@link Comparator} that compares {@link Iterable} according to
+	 *         lexical order w.r.t. element ordering defined by the provided
+	 *         element {@link Comparator}.
 	 */
 	public static final <T> Comparator<? super Iterable<T>> lexicalOrder(
 			final Comparator<? super T> elementComparator) {

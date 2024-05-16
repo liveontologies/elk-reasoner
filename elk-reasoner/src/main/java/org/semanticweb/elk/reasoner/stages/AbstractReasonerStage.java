@@ -136,6 +136,7 @@ abstract class AbstractReasonerStage implements ReasonerStage {
 	 * Execute the stage with initialized parameters
 	 * 
 	 * @throws ElkException
+	 *             if the stage execution fails
 	 */
 	abstract void executeStage() throws ElkException;
 

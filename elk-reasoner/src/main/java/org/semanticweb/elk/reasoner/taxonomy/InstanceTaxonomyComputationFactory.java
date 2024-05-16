@@ -81,8 +81,10 @@ public class InstanceTaxonomyComputationFactory
 	 * pre-computed taxonomy object. The taxonomy is used to avoid computations
 	 * that have been made before. For this to work, the taxonomy object must
 	 * originate from an earlier run of this engine on the same ontology.
-	 * @param interrupter 
 	 * 
+	 * @param interrupter
+	 *            the {@link InterruptMonitor} that can signal interruption of
+	 *            computations for {@link InstanceTaxonomy}
 	 * @param saturationState
 	 *            the saturation state of the reasoner
 	 * @param maxWorkers

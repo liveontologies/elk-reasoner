@@ -725,6 +725,7 @@ public class OwlConverter {
 
 	/**
 	 * @param owlClass
+	 *            the owl object class to be converted
 	 * @return the elk object class corresponding to the given owl object class,
 	 *         or {@code null} if the input class cannot be converted
 	 */

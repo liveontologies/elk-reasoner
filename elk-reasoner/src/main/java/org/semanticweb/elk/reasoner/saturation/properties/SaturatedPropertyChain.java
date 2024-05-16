@@ -237,6 +237,7 @@ public class SaturatedPropertyChain {
 	 * @param writer
 	 *            the {@link Writer} using which the differences are written
 	 * @throws IOException
+	 *             if I/O error happens
 	 */
 	public void dumpDiff(SaturatedPropertyChain other, Writer writer)
 			throws IOException {

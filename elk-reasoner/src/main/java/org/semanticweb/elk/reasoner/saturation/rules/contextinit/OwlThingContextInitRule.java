@@ -65,7 +65,10 @@ public class OwlThingContextInitRule extends AbstractChainableContextInitRule {
 	 * {@link ModifiableOntologyIndex}
 	 * 
 	 * @param owlThing
+	 *            the {@link IndexedClass} for which to add the rule
 	 * @param index
+	 *            a {@link ModifiableOntologyIndex} in which the rule should be
+	 *            added
 	 * @return {@code true} if the operation was successful and {@code false}
 	 *         otherwise; if {@code false} is returned, the index remains
 	 *         unchanged
@@ -81,7 +84,10 @@ public class OwlThingContextInitRule extends AbstractChainableContextInitRule {
 	 * {@link ModifiableOntologyIndex}
 	 * 
 	 * @param owlThing
+	 *            the {@link IndexedClass} for which to remove the rule
 	 * @param index
+	 *            a {@link ModifiableOntologyIndex} in which the rule should be
+	 *            removed
 	 * @return {@code true} if the operation was successful and {@code false}
 	 *         otherwise; if {@code false} is returned, the index remains
 	 *         unchanged

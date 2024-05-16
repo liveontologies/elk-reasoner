@@ -35,8 +35,11 @@ import java.util.Set;
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
- * @param <Key> 
- * @param <Value> 
+ * 
+ * @param <Key>
+ *            the keys of the multimap
+ * @param <Value>
+ *            the values of the multimap 
  */
 public class MultimapQueueImpl<Key, Value> implements MultimapQueue<Key, Value> {
 

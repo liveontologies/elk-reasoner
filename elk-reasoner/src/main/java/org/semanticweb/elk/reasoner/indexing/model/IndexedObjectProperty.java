@@ -98,7 +98,7 @@ public interface IndexedObjectProperty
 	 * @return All {@link IndexedComplexPropertyChain}s in which this
 	 *         {@link IndexedObjectProperty} is a left property
 	 * 
-	 * @see {@link IndexedComplexPropertyChain#getFirstProperty()}
+	 * @see IndexedComplexPropertyChain#getFirstProperty()
 	 */
 	Collection<IndexedComplexPropertyChain> getLeftChains();
 

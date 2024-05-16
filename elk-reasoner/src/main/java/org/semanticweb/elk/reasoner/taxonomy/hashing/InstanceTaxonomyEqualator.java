@@ -50,6 +50,10 @@ public class InstanceTaxonomyEqualator {
 	 * taxonomy is not an instance taxonomy, the taxonomies are compared only by
 	 * {@link TaxonomyEqualator}.
 	 * 
+	 * @param <T>
+	 *            the type of types of the instance taxonomies
+	 * @param <I>
+	 *            the type of instances of the instance taxonomies
 	 * @param taxonomy1
 	 *            The first taxonomy.
 	 * @param taxonomy2

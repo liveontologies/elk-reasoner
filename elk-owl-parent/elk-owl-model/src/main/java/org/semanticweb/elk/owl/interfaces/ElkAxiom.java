@@ -28,8 +28,9 @@ package org.semanticweb.elk.owl.interfaces;
 import org.semanticweb.elk.owl.visitors.ElkAxiomVisitor;
 
 /**
- * Corresponds to an <a href= "http://www.w3.org/TR/owl2-syntax/#Axioms">axiom
- * <a> in the OWL 2 specification.
+ * Corresponds to an
+ * <a href= "http://www.w3.org/TR/owl2-syntax/#Axioms">axiom</a> in the OWL 2
+ * specification.
  * 
  * @author Markus Kroetzsch
  */
@@ -42,6 +43,8 @@ public interface ElkAxiom extends ElkObject {
 	 * 
 	 * @param visitor
 	 *            the visitor that can work with this object type
+	 * @param <O>
+	 *            the type of the output of the visitor
 	 * @return the output of the visitor
 	 */
 	public abstract <O> O accept(ElkAxiomVisitor<O> visitor);

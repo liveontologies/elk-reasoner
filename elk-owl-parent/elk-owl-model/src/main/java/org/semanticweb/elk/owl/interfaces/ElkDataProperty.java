@@ -31,8 +31,8 @@ import org.semanticweb.elk.owl.visitors.ElkDataPropertyVisitor;
 
 /**
  * Corresponds to an
- * <a href= "http://www.w3.org/TR/owl2-syntax/#Data_Properties">Data Property
- * <a> in the OWL 2 specification.
+ * <a href= "http://www.w3.org/TR/owl2-syntax/#Data_Properties">Data
+ * Property</a> in the OWL 2 specification.
  * 
  * @author Markus Kroetzsch
  */
@@ -43,6 +43,8 @@ public interface ElkDataProperty extends ElkDataPropertyExpression, ElkEntity {
 	 * 
 	 * @param visitor
 	 *            the visitor that can work with this object type
+	 * @param <O>
+	 *            the type of the output of the visitor
 	 * @return the output of the visitor
 	 */
 	public abstract <O> O accept(ElkDataPropertyVisitor<O> visitor);

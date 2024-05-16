@@ -53,23 +53,30 @@ public class ConfigurationUtils {
 	 * directory is traversed recursively. The specified creator is used to
 	 * create test manifests for each tuple of files, such that:
 	 * <ul>
-	 * <li/>these files have the same name without the file extension,
-	 * <li/>file at some position in the tuple has file extension that is at
-	 * this position in the specified tuple file extensions,
-	 * <li/>if file with some file extension is missing, {@code null} is at the
-	 * position of this extension.
+	 * <li>these files have the same name without the file extension,</li>
+	 * <li>file at some position in the tuple has file extension that is at this
+	 * position in the specified tuple file extensions,</li>
+	 * <li>if file with some file extension is missing, {@code null} is at the
+	 * position of this extension.</li>
 	 * </ul>
 	 * 
 	 * @param inputDir
-	 *            The input directory.
+	 *            The input directory from which to load the configuration
 	 * @param srcClass
+	 *            the type of the {@link TestManifest} inputs
 	 * @param creator
-	 * @param fileExt 
+	 *            a {@link ManifestCreator} to create {@link TestManifest}
+	 * @param fileExt
+	 *            the first file name extension for which the
+	 *            {@link TestManifest} is loaded
 	 * @param fileExts
-	 *            The file name extensions.
+	 *            the remaining file name extensions
 	 * @return The loaded configuration
-	 * @throws IOException
 	 * @throws URISyntaxException
+	 *             if the input directory is invalid
+	 * @throws IOException
+	 *             if I/O error happens
+	 * @see TestManifest#getInput()
 	 */
 	public static Configuration loadFileBasedTestConfiguration(
 			final String inputDir, final Class<?> srcClass,

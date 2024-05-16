@@ -37,8 +37,9 @@ import org.semanticweb.owlapi.model.OWLDatatypeDefinitionAxiom;
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ *         
  * @param <T>
- * 
+ *            the type of the wrapped object
  */
 public class ElkDatatypeDefinitionAxiomWrap<T extends OWLDatatypeDefinitionAxiom>
 		extends ElkAxiomWrap<T> implements ElkDatatypeDefinitionAxiom {

@@ -44,7 +44,8 @@ public interface ExtendedContext extends Context {
 	 * previous value).
 	 * 
 	 * @param saturated
-	 * @return the previous value of the saturation state for this
+	 *            the saturation flag to be set for this {@code Context}
+	 * @return the previous value of the saturation flag for this
 	 *         {@link Context}
 	 * 
 	 * @see ClassConclusion#getTraceRoot()

@@ -35,7 +35,7 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 /**
  * Corresponds to an <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Disjoint_Union_of_Class_Expressions"
- * >Disjoint Union of Class Expressions Axiom<a> in the OWL 2 specification.
+ * >Disjoint Union of Class Expressions Axiom</a> in the OWL 2 specification.
  * 
  * @author Markus Kroetzsch
  */

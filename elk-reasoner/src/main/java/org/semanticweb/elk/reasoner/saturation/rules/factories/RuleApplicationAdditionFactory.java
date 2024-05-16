@@ -52,6 +52,8 @@ import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
  * @author Pavel Klinov
  * 
  * @param <I>
+ *            the type of the input processed by this
+ *            {@link RuleApplicationFactory}
  */
 public class RuleApplicationAdditionFactory<I extends RuleApplicationInput>
 		extends AbstractRuleApplicationFactory<Context, I> {

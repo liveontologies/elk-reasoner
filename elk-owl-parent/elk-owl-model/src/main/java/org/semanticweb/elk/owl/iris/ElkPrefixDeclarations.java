@@ -28,17 +28,21 @@ package org.semanticweb.elk.owl.iris;
  */
 public interface ElkPrefixDeclarations {
 	/**
-	 * Prefix declaration. Rejects if a prefix with the same name has already
-	 * been declared.
+	 * Add prefix declaration. Rejects if a prefix with the same name has
+	 * already been declared.
 	 * 
 	 * @param prefix
-	 * @return true is successful
+	 *            the prefix to be declared.
+	 * @return {@code true} if the prefix has been added and {@code false} if
+	 *         the prefix was already registered
 	 */
 	public boolean addPrefix(ElkPrefix prefix);
 
 	/**
 	 * @param prefixName
-	 * @return The ElkPrefix associated with the prefixName or null if none.
+	 *            the name of the prefix to be retrieved
+	 * @return The ElkPrefix associated with the prefixName or {@code null} if
+	 *         it does not exist.
 	 */
 	public ElkPrefix getPrefix(String prefixName);
 

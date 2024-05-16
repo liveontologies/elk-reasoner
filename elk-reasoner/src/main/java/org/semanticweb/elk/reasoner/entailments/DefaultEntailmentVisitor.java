@@ -38,7 +38,10 @@ public class DefaultEntailmentVisitor<O> implements Entailment.Visitor<O> {
 
 	/**
 	 * N-OP default visitor
-	 * @param entailment  
+	 * 
+	 * @param entailment
+	 *            the visited {@link Entailment}
+	 * 
 	 * @return {@code null}
 	 */
 	public O defaultVisit(final Entailment entailment) {

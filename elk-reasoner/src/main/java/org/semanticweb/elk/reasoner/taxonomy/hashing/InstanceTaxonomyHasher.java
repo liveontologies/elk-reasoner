@@ -40,6 +40,7 @@ public class InstanceTaxonomyHasher {
 	 * Compute the hash code of a taxonomy.
 	 * 
 	 * @param taxonomy
+	 *            the {@link InstanceTaxonomy} for which to compute the hash
 	 * @return hash
 	 */
 	public static int hash(InstanceTaxonomy<? extends ElkEntity, ? extends ElkEntity> taxonomy) {

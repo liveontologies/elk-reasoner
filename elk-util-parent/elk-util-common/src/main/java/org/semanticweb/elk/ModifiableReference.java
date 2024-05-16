@@ -28,6 +28,8 @@ package org.semanticweb.elk;
  * @author Yevgeny Kazakov
  *
  * @param <O>
+ *            the type of the value of this {@link Reference}
+ * 
  */
 public interface ModifiableReference<O> extends Reference<O> {
 
@@ -36,6 +38,7 @@ public interface ModifiableReference<O> extends Reference<O> {
 	 * {@link #get()} should return this object
 	 * 
 	 * @param object
+	 *            the object to which this {@link Reference} should point
 	 */
 	void set(O object);
 

@@ -32,6 +32,7 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedRangeFiller;
  * @author "Yevgeny Kazakov"
  *
  * @param <O>
+ *            the type of the output
  */
 public class DummyIndexedContextRootVisitor<O> extends
 		DummyIndexedClassExpressionVisitor<O> implements

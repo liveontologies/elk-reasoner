@@ -34,7 +34,7 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 /**
  * Corresponds to an <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Disjoint_Classes">Disjoint Classes
- * Axiom<a> in the OWL 2 specification.
+ * Axiom</a> in the OWL 2 specification.
  * 
  * @author Markus Kroetzsch
  */

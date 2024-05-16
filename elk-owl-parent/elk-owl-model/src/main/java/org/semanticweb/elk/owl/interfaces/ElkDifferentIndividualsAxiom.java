@@ -32,7 +32,7 @@ import org.semanticweb.elk.owl.visitors.ElkDifferentIndividualsAxiomVisitor;
 /**
  * Corresponds to an
  * <a href= "http://www.w3.org/TR/owl2-syntax/#Individual_Inequality">individual
- * inequality axiom<a> in the OWL 2 specification.
+ * inequality axiom</a> in the OWL 2 specification.
  * 
  * @author Markus Kroetzsch
  */
@@ -52,6 +52,8 @@ public interface ElkDifferentIndividualsAxiom extends ElkAssertionAxiom {
 	 * 
 	 * @param visitor
 	 *            the visitor that can work with this axiom type
+	 * @param <O>
+	 *            the type of the output of the visitor
 	 * @return the output of the visitor
 	 */
 	public <O> O accept(ElkDifferentIndividualsAxiomVisitor<O> visitor);

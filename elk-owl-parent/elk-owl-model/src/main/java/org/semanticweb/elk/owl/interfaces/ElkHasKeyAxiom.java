@@ -30,7 +30,7 @@ import java.util.List;
 import org.semanticweb.elk.owl.visitors.ElkHasKeyAxiomVisitor;
 
 /**
- * Corresponds to a <a href= "http://www.w3.org/TR/owl2-syntax/#Keys">Keys<a> in
+ * Corresponds to a <a href= "http://www.w3.org/TR/owl2-syntax/#Keys">Keys</a> in
  * the OWL 2 specification.
  * 
  * @author Pavel Klinov
@@ -51,6 +51,8 @@ public interface ElkHasKeyAxiom extends ElkAxiom {
 	 * 
 	 * @param visitor
 	 *            the visitor that can work with this axiom type
+	 * @param <O>
+	 *            the type of the output of the visitor
 	 * @return the output of the visitor
 	 */
 	public <O> O accept(ElkHasKeyAxiomVisitor<O> visitor);

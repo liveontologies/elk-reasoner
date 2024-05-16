@@ -46,7 +46,7 @@ public interface ElkSameIndividualAxiomConversion
 	 *         the {@link ElkSameIndividualAxiom} that is converted to the
 	 *         sub-class of the {@link IndexedSubClassOfAxiom}.
 	 * 
-	 * @see @see ElkSameIndividualAxiom#getIndividuals()
+	 * @see ElkSameIndividualAxiom#getIndividuals()
 	 * @see IndexedSubClassOfAxiom#getSubClass()
 	 */
 	int getSubIndividualPosition();
@@ -56,7 +56,7 @@ public interface ElkSameIndividualAxiomConversion
 	 *         the {@link ElkSameIndividualAxiom} that is converted to the
 	 *         super-class of the {@link IndexedSubClassOfAxiom}.
 	 * 
-	 * @see @see ElkSameIndividualAxiom#getIndividuals()
+	 * @see ElkSameIndividualAxiom#getIndividuals()
 	 * @see IndexedSubClassOfAxiom#getSuperClass()
 	 */
 	int getSuperIndividualPosition();

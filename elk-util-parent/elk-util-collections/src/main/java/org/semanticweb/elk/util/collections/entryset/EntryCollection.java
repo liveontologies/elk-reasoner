@@ -248,8 +248,10 @@ public class EntryCollection<E extends Entry<E>>
 	 * {@link GenericStructuralObject#structuralHashCode()} methods.
 	 * 
 	 * @param key
-	 *            a {@link GenericStructuralObject} using which the required entry
-	 *            should be found
+	 *            a {@link GenericStructuralObject} using which the required
+	 *            entry should be found
+	 * @param <T>
+	 *            the type of the key
 	 * 
 	 * @return the entry in the set that is equal to the input key, or
 	 *         {@code null} if there is no such an entry
@@ -299,6 +301,8 @@ public class EntryCollection<E extends Entry<E>>
 	 * @param key
 	 *            a {@link GenericStructuralObject} using which the required entry
 	 *            should be found
+	 * @param <T>
+	 *            the type of the key           
 	 * @return the removed entry, or {@code null} if no entry that is equal to
 	 *         the input object is found
 	 */

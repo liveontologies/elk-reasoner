@@ -67,7 +67,9 @@ public class TaxonomyPrinter {
 	 * @see #dumpTaxomomy(Taxonomy, Writer, boolean)
 	 * 
 	 * @param taxonomy
-	 * @param fileName
+	 *            the {@link Taxonomy} to be printed
+	 * @param filePath
+	 *            the file location
 	 * @param addHash
 	 *            if true, a hash string will be added at the end of the output
 	 *            using comment syntax of OWL 2 Functional Style
@@ -75,9 +77,9 @@ public class TaxonomyPrinter {
 	 *             If an I/O error occurs
 	 */
 	public static void dumpTaxomomyToFile(
-			final Taxonomy<? extends ElkEntity> taxonomy, final String fileName,
+			final Taxonomy<? extends ElkEntity> taxonomy, final String filePath,
 			final boolean addHash) throws IOException {
-		final FileWriter fstream = new FileWriter(fileName);
+		final FileWriter fstream = new FileWriter(filePath);
 		final BufferedWriter writer = new BufferedWriter(fstream);
 		try {
 			dumpTaxomomy(taxonomy, writer, addHash);
@@ -87,12 +89,14 @@ public class TaxonomyPrinter {
 	}
 
 	/**
-	 * Print the contents of the given {@link Taxonomy} to the specified Writer.
-	 * Expressions are ordered for generating the output, ensuring that the
-	 * output is deterministic.
+	 * Print the contents of the given {@link Taxonomy} to the specified
+	 * {@link Writer}. Expressions are ordered for generating the output,
+	 * ensuring that the output is deterministic.
 	 * 
 	 * @param taxonomy
+	 *            the {@link Taxonomy} to be printed
 	 * @param writer
+	 *            the {@link Writer} used for printing
 	 * @param addHash
 	 *            if true, a hash string will be added at the end of the output
 	 *            using comment syntax of OWL 2 Functional Style
@@ -119,7 +123,9 @@ public class TaxonomyPrinter {
 	 * @see org.semanticweb.elk.reasoner.taxonomy.TaxonomyPrinter#dumpInstanceTaxomomy
 	 * 
 	 * @param taxonomy
-	 * @param fileName
+	 *            the {@link Taxonomy} to be printed
+	 * @param filePath
+	 *            the file location
 	 * @param addHash
 	 *            if true, a hash string will be added at the end of the output
 	 *            using comment syntax of OWL 2 Functional Style
@@ -128,8 +134,8 @@ public class TaxonomyPrinter {
 	 */
 	public static void dumpInstanceTaxomomyToFile(
 			final InstanceTaxonomy<? extends ElkEntity, ? extends ElkEntity> taxonomy,
-			final String fileName, final boolean addHash) throws IOException {
-		final FileWriter fstream = new FileWriter(fileName);
+			final String filePath, final boolean addHash) throws IOException {
+		final FileWriter fstream = new FileWriter(filePath);
 		final BufferedWriter writer = new BufferedWriter(fstream);
 		try {
 			dumpInstanceTaxomomy(taxonomy, writer, addHash);
@@ -144,7 +150,9 @@ public class TaxonomyPrinter {
 	 * the output is deterministic.
 	 * 
 	 * @param taxonomy
+	 *            the {@link Taxonomy} to be printed
 	 * @param writer
+	 *            the {@link Writer} used for printing
 	 * @param addHash
 	 *            if true, a hash string will be added at the end of the output
 	 *            using comment syntax of OWL 2 Functional Style
@@ -166,12 +174,13 @@ public class TaxonomyPrinter {
 	}
 
 	/**
-	 * Get a has string for the given {@link Taxonomy}. Besides possible hash
+	 * Get a hash string for the given {@link Taxonomy}. Besides possible hash
 	 * collisions (which have very low probability) the hash string is the same
 	 * for two inputs if and only if the inputs describe the same taxonomy. So
 	 * it can be used to compare classification results.
 	 * 
 	 * @param taxonomy
+	 *            the {@link Taxonomy} for which to compute the hash
 	 * @return hash string
 	 */
 	public static String getHashString(Taxonomy<? extends ElkEntity> taxonomy) {
@@ -187,12 +196,14 @@ public class TaxonomyPrinter {
 	 * Process a taxonomy and write a normalized serialization.
 	 * 
 	 * @param taxonomy
+	 *            the {@link Taxonomy} to be processed
 	 * @param writer
+	 *            the {@link Writer} used for printing
 	 * @throws IOException
 	 */
 	protected static <T extends ElkEntity> void processTaxomomy(
 			final Taxonomy<T> taxonomy, final Appendable writer)
-					throws IOException {
+			throws IOException {
 
 		final ElkObject.Factory factory = new ElkObjectEntityRecyclingFactory();
 
@@ -204,9 +215,8 @@ public class TaxonomyPrinter {
 		for (final TaxonomyNode<T> node : taxonomy.getNodes()) {
 			for (final T member : node) {
 				// TODO: this should check whether IRIs are predefined!
-				if (!member.getIri()
-						.equals(taxonomy.getTopNode().getCanonicalMember()
-								.getIri())
+				if (!member.getIri().equals(
+						taxonomy.getTopNode().getCanonicalMember().getIri())
 						&& !member.getIri().equals(taxonomy.getBottomNode()
 								.getCanonicalMember().getIri())) {
 					members.add(member);
@@ -268,7 +278,7 @@ public class TaxonomyPrinter {
 			final I member, final List<I> equivalentMembers,
 			final SortedSet<T> directSuperMembers, final Taxonomy<T> taxonomy,
 			final ElkObject.Factory factory, final Appendable writer)
-					throws IOException {
+			throws IOException {
 
 		if (equivalentMembers.size() > 1) {
 			final ElkAxiom axiom = member.accept(
@@ -379,7 +389,7 @@ public class TaxonomyPrinter {
 
 	protected static <T extends ElkEntity, I extends ElkEntity> void processInstanceTaxomomy(
 			final InstanceTaxonomy<T, I> taxonomy, final Appendable writer)
-					throws IOException {
+			throws IOException {
 
 		final ElkObject.Factory factory = new ElkObjectEntityRecyclingFactory();
 

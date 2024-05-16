@@ -43,7 +43,10 @@ public class InstanceTaxonomyComputationStage extends AbstractReasonerStage {
 
 	/**
 	 * @param reasoner
+	 *            the reasoner for which this {@link ReasonerStage} is created
 	 * @param preStages
+	 *            the {@link ReasonerStage}s that should be completed before
+	 *            this {@link ReasonerStage} in the order in which they are listed
 	 */
 	public InstanceTaxonomyComputationStage(AbstractReasonerState reasoner,
 			AbstractReasonerStage... preStages) {

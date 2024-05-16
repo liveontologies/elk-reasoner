@@ -87,7 +87,9 @@ public interface Multimap<Key, Value> {
 	
 	/**
 	 * Removes all values for the given key
+	 * 
 	 * @param key
+	 *            the key for which to remove the values
 	 * @return the values that have been removed
 	 */
 	Collection<Value> remove(Object key);

@@ -80,7 +80,11 @@ public class BackwardLinkChainFromBackwardLinkRule
 	 * given {@link ForwardLink} in the given {@link Context}
 	 * 
 	 * @param link
+	 *            the {@link ForwardLink} premise of the rule
 	 * @param context
+	 *            the {@link Context} into which the
+	 *            {@link BackwardLinkChainFromBackwardLinkRule} inferences are
+	 *            added
 	 * @return {@code true} if the {@link BackwardLinkChainFromBackwardLinkRule}
 	 *         stored in the {@link Context} is modified as a result of this
 	 *         operation
@@ -97,7 +101,11 @@ public class BackwardLinkChainFromBackwardLinkRule
 	 * the given {@link ForwardLink} from the given {@link Context}
 	 * 
 	 * @param link
+	 *            the {@link ForwardLink} premise of the rule
 	 * @param context
+	 *            the {@link Context} from which the
+	 *            {@link BackwardLinkChainFromBackwardLinkRule} inferences are
+	 *            removed
 	 * @return {@code true} if the {@link BackwardLinkChainFromBackwardLinkRule}
 	 *         stored in the {@link Context} is modified as a result of this
 	 *         operation
@@ -105,8 +113,9 @@ public class BackwardLinkChainFromBackwardLinkRule
 	public static boolean removeRuleFor(ForwardLink link, Context context) {
 		BackwardLinkChainFromBackwardLinkRule rule = context
 				.getBackwardLinkRuleChain().find(MATCHER_);
-		return rule == null ? false : rule.forwardLinksByObjectProperty_
-				.remove(link.getChain(), link.getTarget());
+		return rule == null ? false
+				: rule.forwardLinksByObjectProperty_.remove(link.getChain(),
+						link.getTarget());
 	}
 
 	/**
@@ -114,14 +123,19 @@ public class BackwardLinkChainFromBackwardLinkRule
 	 * the given {@link ForwardLink} is present in the given {@link Context}
 	 * 
 	 * @param link
+	 *            the {@link ForwardLink} premise of the rule
 	 * @param context
+	 *            the {@link Context} for which the
+	 *            {@link BackwardLinkChainFromBackwardLinkRule} is checked for
+	 *            presence of inferences
 	 * @return {@code true} if the inference is present
 	 */
 	public static boolean containsRuleFor(ForwardLink link, Context context) {
 		BackwardLinkChainFromBackwardLinkRule rule = context
 				.getBackwardLinkRuleChain().find(MATCHER_);
-		return rule == null ? false : rule.forwardLinksByObjectProperty_
-				.contains(link.getChain(), link.getTarget());
+		return rule == null ? false
+				: rule.forwardLinksByObjectProperty_.contains(link.getChain(),
+						link.getTarget());
 	}
 
 	@Deprecated
@@ -143,7 +157,8 @@ public class BackwardLinkChainFromBackwardLinkRule
 			return;
 
 		for (IndexedPropertyChain forwardRelation : new LazySetIntersection<IndexedPropertyChain>(
-				compsByForwardRelations.keySet(), forwardLinksByObjectProperty_.keySet())) {
+				compsByForwardRelations.keySet(),
+				forwardLinksByObjectProperty_.keySet())) {
 
 			Collection<IndexedComplexPropertyChain> compositions = compsByForwardRelations
 					.get(forwardRelation);
@@ -158,7 +173,7 @@ public class BackwardLinkChainFromBackwardLinkRule
 							composition);
 		}
 	}
-	
+
 	@Override
 	public void apply(BackwardLink link, ContextPremises premises,
 			ClassInferenceProducer producer) {
@@ -166,7 +181,7 @@ public class BackwardLinkChainFromBackwardLinkRule
 				.getNonRedundantCompositionsByRightSubProperty(), link,
 				premises, producer);
 	}
-	
+
 	@Override
 	public void applyTracing(BackwardLink link, ContextPremises premises,
 			ClassInferenceProducer producer) {

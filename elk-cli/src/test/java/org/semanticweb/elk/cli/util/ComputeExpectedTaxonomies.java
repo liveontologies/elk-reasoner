@@ -92,7 +92,6 @@ public class ComputeExpectedTaxonomies {
 						.getValue(reasoner.getInstanceTaxonomyQuietly());
 			}
 
-			@SuppressWarnings("unchecked")
 			@Override
 			public void dumpTaxonomy(Taxonomy<ElkClass> taxonomy, Writer writer)
 					throws IOException {

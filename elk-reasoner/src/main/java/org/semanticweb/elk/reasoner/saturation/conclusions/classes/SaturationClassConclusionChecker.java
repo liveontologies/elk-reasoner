@@ -51,6 +51,7 @@ public class SaturationClassConclusionChecker
 	 * {@link ClassConclusion#getTraceRoot()}.
 	 * 
 	 * @param conclusion
+	 *            the {@link ClassConclusion} for which the check is performed
 	 * @return {@code true} if the {@link Context} for
 	 *         {@link ClassConclusion#getTraceRoot()} may become unsaturated,
 	 *         and {@code false} if the {@link Context} remains saturated. The

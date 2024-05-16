@@ -34,6 +34,7 @@ import org.semanticweb.elk.owl.visitors.ElkAnnotationAxiomVisitor;
  * @author "Yevgeny Kazakov"
  *
  * @param <O>
+ *            the output type of the visitor
  */
 public class NoOpElkAnnotationAxiomConverter<O> implements
 		ElkAnnotationAxiomVisitor<O> {

@@ -215,9 +215,10 @@ public class RuleApplicationTimer {
 
 
 	/**
-	 * Add the values the corresponding values of the given timer
+	 * Add the values to the corresponding values of the given timer
 	 * 
 	 * @param timer
+	 *            the timer to which the values should be added
 	 */
 	public synchronized void add(RuleApplicationTimer timer) {
 		timeOwlThingContextInitRule += timer.timeOwlThingContextInitRule;

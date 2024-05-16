@@ -29,6 +29,7 @@ package org.semanticweb.elk.util.concurrent.collections;
  * @author "Yevgeny Kazakov"
  *
  * @param <E>
+ *            the type of elements with which this stack works
  */
 public interface ActivationStack<E> {
 
@@ -40,6 +41,7 @@ public interface ActivationStack<E> {
 	 * that {@link #pop()} would return {@code null}, but not cleared.
 	 * 
 	 * @param element
+	 *            the element to be inserted at the head of the stack
 	 * @return {@code true} if this is the first element inserted after the
 	 *         stack has been cleared.
 	 * @throws IllegalArgumentException

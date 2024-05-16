@@ -38,6 +38,7 @@ public interface ReferenceFactory<T, O> {
 	 * Creates a references to the given object
 	 * 
 	 * @param object
+	 *            the object to which to create the reference
 	 * @return the reference to the given object
 	 */
 	O create(T object);

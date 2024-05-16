@@ -28,12 +28,13 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.interfaces.ElkObjectSomeValuesFrom;
-import org.semanticweb.elk.reasoner.saturation.conclusions.classes.PropagationImpl;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.Propagation;
 import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkComposition;
 import org.semanticweb.elk.reasoner.saturation.inferences.BackwardLinkOfObjectSomeValuesFrom;
 import org.semanticweb.elk.reasoner.saturation.inferences.ForwardLinkComposition;
 import org.semanticweb.elk.reasoner.saturation.inferences.ForwardLinkOfObjectSomeValuesFrom;
+import org.semanticweb.elk.reasoner.saturation.inferences.PropagationInference;
 import org.semanticweb.elk.reasoner.saturation.properties.SaturatedPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.rules.ClassInferenceProducer;
 import org.semanticweb.elk.reasoner.saturation.rules.subsumers.PropagationFromExistentialFillerRule;
@@ -89,12 +90,18 @@ public interface IndexedObjectSomeValuesFrom extends IndexedComplexClassExpressi
 	class Helper {
 
 		/**
-		 * Generates {@link PropagationImpl}s for the {@link ContextPremises}
-		 * that apply for the given {@link IndexedObjectProperty}
+		 * Generates {@link PropagationInference}s for the {@link ContextPremises} that
+		 * apply for the given {@link IndexedObjectProperty}
 		 * 
 		 * @param property
+		 *            the {@link IndexedObjectProperty} for which to generate
+		 *            the {@link PropagationInference}s
 		 * @param premises
+		 *            the {@link ContextPremises} for which to generate the
+		 *            {@link PropagationInference}s
 		 * @param producer
+		 *            a {@link ClassInferenceProducer} using which the resulting
+		 *            {@link PropagationInference}s are produced
 		 */
 		public static void generatePropagations(IndexedObjectProperty property,
 				ContextPremises premises, ClassInferenceProducer producer) {
@@ -107,6 +114,8 @@ public interface IndexedObjectSomeValuesFrom extends IndexedComplexClassExpressi
 
 		/**
 		 * @param existential
+		 *            the {@link IndexedObjectSomeValuesFrom} that is being
+		 *            decomposed
 		 * @return the {@link IndexedContextRoot} that is required for
 		 *         decomposition of the given
 		 *         {@link IndexedObjectSomeValuesFrom}, taking into account the

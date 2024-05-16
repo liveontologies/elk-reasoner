@@ -31,6 +31,8 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
  * @author Yevgeny Kazakov
  *
  * @param <C>
+ *            the type of contexts observed by this
+ *            {@link SaturationState.ChangeListener}
  */
 public class SaturationStateDummyChangeListener<C extends Context>
 		implements SaturationState.ChangeListener<C> {

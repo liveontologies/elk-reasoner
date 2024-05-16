@@ -80,10 +80,13 @@ public class IOUtils {
 	 * Copies bytes from the input stream to the output stream
 	 * 
 	 * @param input
+	 *            the input stream
 	 * @param output
+	 *            the output stream
 	 * 
 	 * @return The number of bytes copied
 	 * @throws IOException
+	 *             if an I/O error occurs
 	 */
 	public static int copy(InputStream input, OutputStream output)
 			throws IOException {
@@ -135,7 +138,9 @@ public class IOUtils {
 
 	/**
 	 * @param dir
+	 *            a {@link File} corresponding to a directory
 	 * @param extension
+	 *            the file extension to look for
 	 * @return A list of paths relative to {@code dir} of the files from
 	 *         {@code dir} with the provided filename extension. The directory
 	 *         is traversed recursively.
@@ -152,11 +157,14 @@ public class IOUtils {
 	 * the given Java class)
 	 * 
 	 * @param path
-	 * 
+	 *            the path within the JAR file to look for resources
 	 * @param extension
+	 *            the file extension of the resources to look for
 	 * @param clazz
+	 *            the class corresponding to the JAR file
 	 * @return the list of resource names from a JAR file
 	 * @throws IOException
+	 *             if an I/O error occurs
 	 */
 	public static List<String> getResourceNamesFromJAR(String path,
 			String extension, Class<?> clazz) throws IOException {

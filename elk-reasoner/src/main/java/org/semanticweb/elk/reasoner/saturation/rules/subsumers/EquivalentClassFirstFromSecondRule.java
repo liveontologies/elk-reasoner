@@ -97,6 +97,8 @@ public class EquivalentClassFirstFromSecondRule extends AbstractChainableSubsume
 	/**
 	 * 
 	 * @param firstMember
+	 *            the {@link IndexedClassExpression} for which to find the
+	 *            {@link ElkAxiom}
 	 * @return the {@link ElkAxiom} that is responsible for the given first
 	 *         equivalent member or {@code null} if such an axiom does not exist
 	 */

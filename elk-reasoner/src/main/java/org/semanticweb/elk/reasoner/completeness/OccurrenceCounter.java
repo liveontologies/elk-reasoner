@@ -33,6 +33,7 @@ public interface OccurrenceCounter {
 
 	/**
 	 * @param occurrence
+	 *            the {@link Feature} for which to retrieve the information
 	 * @return the number of times a given {@link Feature} appears
 	 */
 	public int getOccurrenceCount(Feature occurrence);

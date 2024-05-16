@@ -54,10 +54,6 @@ import org.semanticweb.owlapi.reasoner.InferenceType;
  */
 public class RetrievingProofsForEntailment {
 
-	/**
-	 * @param args
-	 * @throws OWLOntologyCreationException
-	 */
 	public static void main(String[] args) throws OWLOntologyCreationException {
 		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 

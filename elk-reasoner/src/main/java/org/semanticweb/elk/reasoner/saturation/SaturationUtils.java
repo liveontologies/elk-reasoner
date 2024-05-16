@@ -94,6 +94,7 @@ public class SaturationUtils {
 
 	/**
 	 * @param visitors
+	 *            the {@link ClassConclusion.Visitor}s to be composed
 	 * @return A {@link ClassConclusion.Visitor} that applies the given
 	 *         {@link ClassConclusion.Visitor}s consequently until one of them
 	 *         returns {@code false}. {@link ClassConclusion.Visitor}s that are
@@ -108,6 +109,7 @@ public class SaturationUtils {
 
 	/**
 	 * @param visitors
+	 *            the {@link ClassConclusion.Visitor}s to be composed
 	 * @return A {@link ClassInference.Visitor} that applies the given
 	 *         {@link ClassInference.Visitor}s consequently until one of them
 	 *         returns {@code false}. {@link ClassInference.Visitor}s that are

@@ -41,11 +41,11 @@ import org.semanticweb.elk.reasoner.tracing.Conclusion.Factory;
  * 
  * Notation:
  * 
- * <pre>
+ * <pre>{@code
  *    [C] ⊑ -∃R.D
  * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
  *  C ⊑ <∃R>.[D ⊓ ∃R-]
- * </pre>
+ * }</pre>
  * 
  * The parameters can be obtained as follows:<br>
  * 

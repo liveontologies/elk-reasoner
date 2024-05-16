@@ -43,6 +43,7 @@ public interface Owl2Parser {
 	 * prefixes can be supplied separately.
 	 * 
 	 * @param elkPrefix
+	 *            the prefix to be registered by this parser
 	 */
 	public void declarePrefix(ElkPrefix elkPrefix);
 

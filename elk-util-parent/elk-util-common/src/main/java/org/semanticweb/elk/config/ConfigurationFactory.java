@@ -59,13 +59,14 @@ public class ConfigurationFactory {
 	final static Logger LOGGER_ = LoggerFactory.getLogger(ConfigurationFactory.class);
 
 	/**
-	 * 
 	 * @param prefix
+	 *            the prefix of configuration options to be loaded
 	 * @param configClass
+	 *            the class to be instantiated with the loaded options
 	 * @return the {@link BaseConfiguration} for the specified parameters
 	 * @throws ConfigurationException
+	 *             if loading fails
 	 */
-	@SuppressWarnings("static-method")
 	public BaseConfiguration getConfiguration(String prefix,
 			Class<? extends BaseConfiguration> configClass)
 			throws ConfigurationException {
@@ -93,7 +94,6 @@ public class ConfigurationFactory {
 		return config;
 	}
 
-	@SuppressWarnings("static-method")
 	public BaseConfiguration getConfiguration(InputStream source,
 			String prefix, Class<? extends BaseConfiguration> configClass)
 			throws ConfigurationException, IOException {
@@ -112,12 +112,14 @@ public class ConfigurationFactory {
 	 * Not a thread-safe method. Shouldn't be invoked concurrently.
 	 * 
 	 * @param configOnDisk
+	 *            the file into which to save
 	 * @param config
+	 *            the {@link BaseConfiguration} to save
 	 * @throws ConfigurationException
-	 * @throws IOException
+	 *             if saving fails
 	 */
 	public void saveConfiguration(File configOnDisk, BaseConfiguration config)
-			throws ConfigurationException, IOException {
+			throws ConfigurationException {
 		/*
 		 * Unfortunately, we can't directly write the config on disk because the
 		 * parameters in it may be just a subset of those on disk. So we load it

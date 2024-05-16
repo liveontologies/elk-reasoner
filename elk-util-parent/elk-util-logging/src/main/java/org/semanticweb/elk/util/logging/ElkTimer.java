@@ -76,8 +76,12 @@ public class ElkTimer {
 	 * total CPU time across all threads.
 	 * 
 	 * @param name
+	 *            the name of this {@link ElkTimer}
 	 * @param todoFlags
+	 *            an integer encoding the timer options
 	 * @param threadId
+	 *            the thread id for which the CPU time should be measured or 0
+	 *            if the timer is not associated with any thread
 	 */
 	public ElkTimer(String name, int todoFlags, long threadId) {
 		this.name = name;
@@ -92,7 +96,9 @@ public class ElkTimer {
 	/**
 	 * 
 	 * @param name
+	 *            the name of this {@link ElkTimer}
 	 * @param todoFlags
+	 *            an integer encoding the timer options
 	 * @return a new {@link ElkTimer} for the current thread
 	 */
 	static public ElkTimer getTimerForCurrentThread(String name, int todoFlags) {
@@ -222,8 +228,9 @@ public class ElkTimer {
 	/**
 	 * Print logging information for the timer using debug priority.
 	 * 
-	 * @see org.semanticweb.elk.util.logging.ElkTimer#log(Logger,Priority) log()
+	 * @see org.semanticweb.elk.util.logging.ElkTimer#log(Logger,LogLevel) log()
 	 * @param logger
+	 *            the {@link Logger} used for printig
 	 */
 	public void log(Logger logger) {
 		log(logger, LogLevel.DEBUG);
@@ -236,7 +243,11 @@ public class ElkTimer {
 	 * output but a warning will be logged.
 	 * 
 	 * @param logger
+	 *            the {@link Logger} used for printig
+	 * 
 	 * @param priority
+	 *            the {@link LogLevel} used for printing
+	 * 
 	 */
 	public void log(Logger logger, LogLevel priority) {
 		if (LoggerWrap.isEnabledFor(logger, priority)) {
@@ -321,6 +332,8 @@ public class ElkTimer {
 	 * @param timerName
 	 *            the name of the timer
 	 * @param todoFlags
+	 *            an integer encoding the timer options
+	 * 
 	 */
 	public static void startNamedTimer(String timerName, int todoFlags) {
 		getNamedTimer(timerName, todoFlags).start();
@@ -333,6 +346,7 @@ public class ElkTimer {
 	 * @param timerName
 	 *            the name of the timer
 	 * @param todoFlags
+	 *            an integer encoding the timer options
 	 * @param threadId
 	 *            of the thread to track, or 0 if only system clock should be
 	 *            tracked
@@ -364,6 +378,7 @@ public class ElkTimer {
 	 * @param timerName
 	 *            the name of the timer
 	 * @param todoFlags
+	 *            an integer encoding the timer options
 	 * @return CPU time if timer existed and was running, and -1 otherwise
 	 */
 	public static long stopNamedTimer(String timerName, int todoFlags) {
@@ -379,6 +394,7 @@ public class ElkTimer {
 	 * @param timerName
 	 *            the name of the timer
 	 * @param todoFlags
+	 *            an integer encoding the timer options
 	 * @param threadId
 	 *            of the thread to track, or 0 if only system clock should be
 	 *            tracked
@@ -412,6 +428,7 @@ public class ElkTimer {
 	 * @param timerName
 	 *            the name of the timer
 	 * @param todoFlags
+	 *            an integer encoding the timer options
 	 */
 	public static void resetNamedTimer(String timerName, int todoFlags) {
 		getNamedTimer(timerName, todoFlags).reset();
@@ -424,6 +441,7 @@ public class ElkTimer {
 	 * @param timerName
 	 *            the name of the timer
 	 * @param todoFlags
+	 *            an integer encoding the timer options
 	 * @param threadId
 	 *            of the thread to track, or 0 if only system clock should be
 	 *            tracked
@@ -463,6 +481,7 @@ public class ElkTimer {
 	 * @param timerName
 	 *            the name of the timer
 	 * @param todoFlags
+	 *            an integer encoding the timer options
 	 * @return timer
 	 */
 	public static ElkTimer getNamedTimer(String timerName, int todoFlags) {
@@ -477,6 +496,7 @@ public class ElkTimer {
 	 * @param timerName
 	 *            the name of the timer
 	 * @param todoFlags
+	 *            an integer encoding the timer options
 	 * @param threadId
 	 *            of the thread to track, or 0 if only system clock should be
 	 *            tracked

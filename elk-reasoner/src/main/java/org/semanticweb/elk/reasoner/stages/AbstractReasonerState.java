@@ -361,6 +361,7 @@ public abstract class AbstractReasonerState implements TracingProof {
 	 * Incremental mode should be changed only during completing loading.
 	 * 
 	 * @throws ElkException
+	 *             if loading cannot be competed successfully
 	 */
 	public synchronized void ensureLoading() throws ElkException {
 
@@ -390,6 +391,7 @@ public abstract class AbstractReasonerState implements TracingProof {
 	 * invalidates stages that depend on the saturation if it changed.
 	 * 
 	 * @throws ElkException
+	 *             if the operation cannot be competed successfully
 	 */
 	private void restoreSaturation() throws ElkException {
 
@@ -1042,6 +1044,7 @@ public abstract class AbstractReasonerState implements TracingProof {
 	 *            The queries axiom.
 	 * @return the {@link VerifiableQueryResult} for the queried axiom.
 	 * @throws ElkException
+	 *             if the reasoning process cannot be completed successfully
 	 */
 	public synchronized VerifiableQueryResult checkEntailment(
 			final ElkAxiom axiom) throws ElkException {

@@ -40,6 +40,7 @@ import org.semanticweb.elk.util.collections.ArrayHashSet;
  * @author Peter Skocovsky
  * 
  * @param <T>
+ *            the type of members of this node
  */
 public class QueryNode<T extends ElkEntity> extends SimpleNode<T>
 		implements Node<T> {

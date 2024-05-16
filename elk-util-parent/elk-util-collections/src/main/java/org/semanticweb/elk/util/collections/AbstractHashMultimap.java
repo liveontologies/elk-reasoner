@@ -32,9 +32,10 @@ import java.util.Collections;
  * @author Frantisek Simancik
  * 
  * @param <Key>
+ *            the keys of the multimap
  * @param <Value>
+ *            the values of the multimap
  */
-
 public abstract class AbstractHashMultimap<Key, Value> extends
 		ArrayHashMap<Key, Collection<Value>> implements Multimap<Key, Value> {
 
@@ -77,6 +78,7 @@ public abstract class AbstractHashMultimap<Key, Value> extends
 
 	/**
 	 * @param key
+	 *            the key for which to retrieve the associated values
 	 * @return the collection of values associated with the given key, or
 	 *         {@code null} if no value us associated
 	 */

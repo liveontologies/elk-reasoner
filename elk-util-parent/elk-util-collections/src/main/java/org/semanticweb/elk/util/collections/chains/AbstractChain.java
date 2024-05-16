@@ -90,6 +90,11 @@ public abstract class AbstractChain<T extends ModifiableLink<T>> implements
 	 * the returned {@link Chain}, such as addition or removal, will be
 	 * reflected accordingly in the corresponding value in the {@link Map}.
 	 * 
+	 * @param <K>
+	 *            the types of the keys of the {@link Map}
+	 * @param <T>
+	 *            the types of the values of the {@link Map} and the elements of
+	 *            the resulting {@link Chain}
 	 * @param map
 	 *            the {@link Map} that backs the data
 	 * @param key

@@ -28,7 +28,9 @@ package org.semanticweb.elk.util.concurrent.computation;
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
+ * 
  * @param <J>
+ *            the type of the jobs to be submitted and processed
  */
 public class DelegatingInputProcessor<J> implements InputProcessor<J> {
 

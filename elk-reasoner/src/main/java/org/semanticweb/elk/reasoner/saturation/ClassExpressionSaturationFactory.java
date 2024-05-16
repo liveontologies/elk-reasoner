@@ -194,6 +194,8 @@ public class ClassExpressionSaturationFactory<J extends SaturationJob<? extends 
 	 * number of workers that can apply the rules concurrently.
 	 * 
 	 * @param ruleAppFactory
+	 *            a {@link RuleApplicationFactory} used for creating this
+	 *            {@link ClassExpressionSaturationFactory}
 	 * @param maxWorkers
 	 *            the maximum number of workers that can use this factory
 	 */

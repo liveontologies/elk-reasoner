@@ -33,8 +33,9 @@ import org.semanticweb.elk.owl.interfaces.ElkAxiom;
  * @author Pavel Klinov
  * 
  *         pavel.klinov@uni-ulm.de
- *         
- * @param <T> 
+ * 
+ * @param <T>
+ *            the type of axioms for which this listener can be used
  */
 public interface AxiomLoadingListener<T> {
 

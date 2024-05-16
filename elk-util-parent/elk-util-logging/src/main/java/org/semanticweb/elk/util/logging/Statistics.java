@@ -46,7 +46,9 @@ public class Statistics {
 	 * the start and end of overlapping code.
 	 * 
 	 * @param operationName
+	 *            the name of the operation to be reported
 	 * @param logger
+	 *            the {@link Logger} used to print the messages
 	 */
 	public static void logOperationStart(String operationName, Logger logger) {
 		logOperationStart(operationName, logger, LogLevel.DEBUG);
@@ -60,8 +62,11 @@ public class Statistics {
 	 * the start and end of overlapping code.
 	 * 
 	 * @param operationName
+	 *            the name of the operation to be reported
 	 * @param logger
+	 *            the {@link Logger} used to print the messages
 	 * @param priority
+	 *            the {@link LogLevel} of the messages
 	 */
 	public static void logOperationStart(String operationName, Logger logger,
 			LogLevel priority) {
@@ -79,7 +84,9 @@ public class Statistics {
 	 * logged using logOperationStart(), using INFO priority.
 	 * 
 	 * @param operationName
+	 *            the name of the operation to be reported
 	 * @param logger
+	 *            the {@link Logger} used to print the messages
 	 */
 	public static void logOperationFinish(String operationName, Logger logger) {
 		logOperationFinish(operationName, logger, LogLevel.DEBUG);
@@ -90,8 +97,11 @@ public class Statistics {
 	 * logged using logOperationStart(), using the given logging priority.
 	 * 
 	 * @param operationName
+	 *            the name of the operation to be reported
 	 * @param logger
+	 *            the {@link Logger} used to print the messages
 	 * @param priority
+	 *            the {@link LogLevel} of the messages
 	 */
 	public static void logOperationFinish(String operationName, Logger logger,
 			LogLevel priority) {
@@ -108,6 +118,7 @@ public class Statistics {
 	 * Log the current total memory usage using DEBUG priority.
 	 * 
 	 * @param logger
+	 *            the {@link Logger} used to print the messages
 	 */
 	public static void logMemoryUsage(Logger logger) {
 		logMemoryUsage(logger, LogLevel.DEBUG);
@@ -117,7 +128,9 @@ public class Statistics {
 	 * Log the current total memory usage with the specified priority.
 	 * 
 	 * @param logger
-	 * @param priority 
+	 *            the {@link Logger} used to print the messages
+	 * @param priority
+	 *            the {@link LogLevel} of the messages 
 	 */
 	public static void logMemoryUsage(Logger logger, LogLevel priority) {
 		if (LoggerWrap.isEnabledFor(logger, priority)) {

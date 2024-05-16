@@ -123,6 +123,8 @@ public class Reasoner extends AbstractReasonerState {
 	 * potentially long-running operations.
 	 * 
 	 * @param progressMonitor
+	 *            {@link ProgressMonitor} to be used to keep track of the
+	 *            progress
 	 */
 	public synchronized void setProgressMonitor(
 			ProgressMonitor progressMonitor) {
@@ -137,6 +139,8 @@ public class Reasoner extends AbstractReasonerState {
 	 * declared (but not used in any axiom).
 	 * 
 	 * @param allow
+	 *            {@code true} if fresh entitiies should be allowed and
+	 *            {@code false} otherwise
 	 */
 	public synchronized void setAllowFreshEntities(boolean allow) {
 		allowFreshEntities = allow;
@@ -158,19 +162,24 @@ public class Reasoner extends AbstractReasonerState {
 	}
 
 	/**
-	 * Sets the number of working threads. Shouldn't be used during reasoning.
+	 * Sets the number of working threads to be used for reasoner computations.
 	 * 
 	 * @param workerNo
+	 *            the number of working threads to be used for reasoner
+	 *            computations.
+	 * 
 	 */
 	public synchronized void setNumberOfWorkers(int workerNo) {
 		workerNo_ = workerNo;
 	}
 
 	/**
-	 * This supposed to be the central place where the reasoner gets its
-	 * configuration options
+	 * Set {@link ReasonerConfiguration} options to be used for this
+	 * {@link Reasoner}
 	 * 
 	 * @param config
+	 *            {@link ReasonerConfiguration} from which the {@link Reasoner}
+	 *            options should be loaded
 	 */
 	public synchronized void setConfigurationOptions(
 			ReasonerConfiguration config) {

@@ -212,9 +212,10 @@ public class RuleCounter {
 	long countEquivalentClassSecondFromFirstRule;
 
 	/**
-	 * Add the values the corresponding values of the given counter
+	 * Add the values to the corresponding values of the given counter
 	 * 
 	 * @param counter
+	 *            the counter to which the values should be added
 	 */
 	public synchronized void add(RuleCounter counter) {
 		countOwlThingContextInitRule += counter.countOwlThingContextInitRule;

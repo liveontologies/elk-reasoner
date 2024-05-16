@@ -41,11 +41,15 @@ public class SaturationStateFactory {
 	 * Creates a new {@link SaturationState}
 	 * 
 	 * @param ontologyIndex
-	 * @return the new state
+	 *            the {@link OntologyIndex} used by the new
+	 *            {@link SaturationState}
+	 * @return the new {@link SaturationState}
 	 */
 	public static SaturationState<? extends Context> createSaturationState(
 			OntologyIndex ontologyIndex) {
 		return new ReferenceSaturationState(ontologyIndex);
-		//return new MapSaturationState<ExtendedContext>(ontologyIndex, new MainContextFactory(), ontologyIndex.getIndexedClassExpressions().size());
+		// return new MapSaturationState<ExtendedContext>(ontologyIndex, new
+		// MainContextFactory(),
+		// ontologyIndex.getIndexedClassExpressions().size());
 	}
 }

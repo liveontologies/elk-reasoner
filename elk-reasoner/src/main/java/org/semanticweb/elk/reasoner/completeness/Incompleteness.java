@@ -50,9 +50,10 @@ public class Incompleteness {
 
 	/**
 	 * @param monitors
+	 *            the {@link IncompletenessMonitor} to be combined
 	 * @return an {@link IncompletenessMonitor} that monitors several other
-	 *         {@link IncompletenessMonitor}s. and reports incompleteness if
-	 *         some of these monitors report incompleteness. The status messages
+	 *         {@link IncompletenessMonitor}s and reports incompleteness if some
+	 *         of these monitors report incompleteness. The status messages
 	 *         include information about a bounded number of these monitors.
 	 */
 	public static IncompletenessMonitor someOf(
@@ -62,6 +63,7 @@ public class Incompleteness {
 
 	/**
 	 * @param monitors
+	 *            the {@link IncompletenessMonitor} to be combined
 	 * @return an {@link IncompletenessMonitor} that monitors several other
 	 *         {@link IncompletenessMonitor}s. and reports incompleteness if
 	 *         some of these monitors report incompleteness. The status messages
@@ -75,6 +77,7 @@ public class Incompleteness {
 
 	/**
 	 * @param monitors
+	 *            the {@link IncompletenessMonitor} to be combined
 	 * @return an {@link IncompletenessMonitor} that monitors several other
 	 *         {@link IncompletenessMonitor}s and reports incompleteness if some
 	 *         of these monitors report incompleteness. The status messages
@@ -88,6 +91,7 @@ public class Incompleteness {
 
 	/**
 	 * @param monitors
+	 *            the {@link IncompletenessMonitor} to be combined
 	 * @return an {@link IncompletenessMonitor} that monitors several other
 	 *         {@link IncompletenessMonitor}s and reports incompleteness if some
 	 *         of these monitors report incompleteness. The status messages
@@ -106,12 +110,20 @@ public class Incompleteness {
 	 * are listed
 	 * 
 	 * @param <RA>
+	 *            the type of the first input result
 	 * @param <RB>
+	 *            the type of the second input result
 	 * @param <O>
+	 *            the type of the output result
 	 * @param <E>
+	 *            the type of the exception that can occur during composition
 	 * @param first
+	 *            the first {@link IncompleteResult}
 	 * @param second
+	 *            the second {@link IncompleteResult}
 	 * @param fn
+	 *            the function used for composing the inputs of the
+	 *            {@link IncompleteResult}s
 	 * @return the {@link IncompleteResult} whose value is obtained by applying
 	 *         the function to the values of the given
 	 *         {@link IncompleteResult}s, and whose
@@ -135,13 +147,24 @@ public class Incompleteness {
 	 * are listed
 	 * 
 	 * @param <RA>
+	 *            the type of the first input result
 	 * @param <RB>
+	 *            the type of the second input result
+	 * @param <RC>
+	 *            the type of the third input result           
 	 * @param <O>
+	 *            the type of the output result
 	 * @param <E>
+	 *            the type of the exception that can occur during composition
 	 * @param first
+	 *            the first {@link IncompleteResult}
 	 * @param second
+	 *            the second {@link IncompleteResult}
 	 * @param third
+	 *            the third {@link IncompleteResult}            
 	 * @param fn
+	 *            the function used for composing the inputs of the
+	 *            {@link IncompleteResult}s
 	 * @return the {@link IncompleteResult} whose value is obtained by applying
 	 *         the function to the values of the given
 	 *         {@link IncompleteResult}s, and whose
@@ -176,10 +199,9 @@ public class Incompleteness {
 	 * necessary log messages about incompleteness
 	 * 
 	 * @param <R>
-	 *                   the type of the values of the result
+	 *            the type of the values of the result
 	 * @param result
-	 *                   the {@link IncompleteResult} whose value should be
-	 *                   returned
+	 *            the {@link IncompleteResult} whose value should be returned
 	 * @return the value of the given {@link IncompleteResult}
 	 */
 	static public <R> R getValue(IncompleteResult<? extends R> result) {
@@ -192,10 +214,11 @@ public class Incompleteness {
 	 * producing the necessary log messages about its incompleteness.
 	 * 
 	 * @param result
-	 *                   the {@link QueryResult} whose entailment to be returned
+	 *            the {@link QueryResult} whose entailment to be returned
 	 * @return {@code true} if the entailment was proved and {@code false}
 	 *         otherwise
 	 * @throws ElkQueryException
+	 *             if this {@link QueryResult} has not been computed yet
 	 */
 	static public boolean getValue(QueryResult result)
 			throws ElkQueryException {

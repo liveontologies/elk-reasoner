@@ -32,7 +32,7 @@ import org.semanticweb.elk.owl.visitors.ElkDisjointUnionAxiomVisitor;
 /**
  * Corresponds to an <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Disjoint_Union_of_Class_Expressions" >
- * Disjoint Union of Class Expressions Axiom<a> in the OWL 2 specification.
+ * Disjoint Union of Class Expressions Axiom</a> in the OWL 2 specification.
  * 
  * @author Markus Kroetzsch
  */
@@ -59,6 +59,8 @@ public interface ElkDisjointUnionAxiom extends ElkClassAxiom {
 	 * 
 	 * @param visitor
 	 *            the visitor that can work with this axiom type
+	 * @param <O>
+	 *            the type of the output of the visitor
 	 * @return the output of the visitor
 	 */
 	public abstract <O> O accept(ElkDisjointUnionAxiomVisitor<O> visitor);

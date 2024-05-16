@@ -71,10 +71,6 @@ public class Main {
 	// logger for this class
 	private static final Logger LOGGER_ = LoggerFactory.getLogger(Main.class);
 
-	/**
-	 * @param args
-	 * @throws Exception
-	 */
 	public static void main(String[] args) throws Exception {
 
 		OptionParser parser = new OptionParser();
@@ -181,7 +177,8 @@ public class Main {
 
 		try {
 			if (options.has(satisfiable)) {
-				boolean inconsistent = Incompleteness.getValue(reasoner.isInconsistent());
+				boolean inconsistent = Incompleteness
+						.getValue(reasoner.isInconsistent());
 				if (options.hasArgument(outputFile)) {
 					writeConsistencyToFile(options.valueOf(outputFile),
 							!inconsistent);
@@ -191,7 +188,8 @@ public class Main {
 			boolean addHash = options.has(printHash);
 
 			if (options.has(classify)) {
-				Taxonomy<ElkClass> taxonomy = Incompleteness.getValue(reasoner.getTaxonomyQuietly());
+				Taxonomy<ElkClass> taxonomy = Incompleteness
+						.getValue(reasoner.getTaxonomyQuietly());
 
 				if (options.hasArgument(outputFile))
 					writeClassTaxonomyToFile(options.valueOf(outputFile),
@@ -202,7 +200,8 @@ public class Main {
 
 			if (options.has(realize)) {
 				InstanceTaxonomy<ElkClass, ElkNamedIndividual> taxonomy = null;
-				taxonomy = Incompleteness.getValue(reasoner.getInstanceTaxonomyQuietly());
+				taxonomy = Incompleteness
+						.getValue(reasoner.getInstanceTaxonomyQuietly());
 				if (options.hasArgument(outputFile))
 					writeInstanceTaxonomyToFile(options.valueOf(outputFile),
 							taxonomy, addHash);

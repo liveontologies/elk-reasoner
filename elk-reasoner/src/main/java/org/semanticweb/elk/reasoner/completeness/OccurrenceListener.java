@@ -34,7 +34,10 @@ public interface OccurrenceListener {
 	 * changed by the given increment
 	 * 
 	 * @param feature
+	 *            the {@link Feature} for which the number of occurrences has
+	 *            changed
 	 * @param increment
+	 *            the change in the number of occurrences
 	 */
 	public void occurrenceChanged(Feature feature, int increment);
 

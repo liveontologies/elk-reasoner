@@ -28,7 +28,7 @@ import org.semanticweb.elk.owl.iris.ElkIri;
 /**
  * 
  * <a href= "http://www.w3.org/TR/owl2-syntax/#IRIs" >Reserved Vocabulary of OWL
- * 2 with Special Treatment<a> in OWL 2 (see Table 3 in the link).
+ * 2 with Special Treatment</a> in OWL 2 (see Table 3 in the link).
  * 
  * @author "Yevgeny Kazakov"
  *

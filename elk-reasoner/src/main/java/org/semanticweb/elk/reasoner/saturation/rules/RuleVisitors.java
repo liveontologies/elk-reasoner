@@ -36,10 +36,13 @@ public class RuleVisitors {
 
 	/**
 	 * @param visitor
+	 *            {@link RuleVisitor} to which the calls should be delegated
+	 * @param <O>
+	 *            the type of output parameter with which this visitor works
 	 * @return A {@link RuleVisitor} that delegates the calls to the provided
 	 *         {@link RuleVisitor} when for the {@link Rule} which accepts this
-	 *         visitor, {@link Rule#isTracingRule()} returns {@code true}. Otherwise
-	 *         the {@link RuleVisitor} returns {@code null}.
+	 *         visitor, {@link Rule#isTracingRule()} returns {@code true}.
+	 *         Otherwise the {@link RuleVisitor} returns {@code null}.
 	 * 
 	 * @see Rule#isTracingRule()
 	 */
@@ -49,8 +52,10 @@ public class RuleVisitors {
 
 	/**
 	 * @param visitor
-	 *            the {@link SubsumerDecompositionVisitor} used to execute the
-	 *            methods
+	 *            the {@link SubsumerDecompositionVisitor} to which the calls
+	 *            should be delegated
+	 * @param <O>
+	 *            the type of output parameter with which this visitor works
 	 * @param counter
 	 *            the {@link RuleCounter} used to count the number of method
 	 *            invocations
@@ -65,11 +70,13 @@ public class RuleVisitors {
 
 	/**
 	 * @param visitor
-	 *            the {@link SubsumerDecompositionVisitor} used to execute the
-	 *            methods
+	 *            the {@link SubsumerDecompositionVisitor} to which the calls
+	 *            should be delegated
+	 * @param <O>
+	 *            the type of output parameter with which this visitor works
 	 * @param timer
-	 *            the {@link RuleApplicationTimer} used to mesure the time spent
-	 *            within the methods
+	 *            the {@link RuleApplicationTimer} used to measure the time
+	 *            spent within the methods
 	 * 
 	 * @return a new {@link SubsumerDecompositionVisitor} that executes the
 	 *         corresponding methods of the given

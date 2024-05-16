@@ -57,8 +57,6 @@ public interface Evictor<E> extends HasStats {
 	 * Return elements that are evicted. Does not evict the elements for which
 	 * {@code retain} returns {@code true}.
 	 * 
-	 * @param element
-	 *            The added element.
 	 * @param retain
 	 *            A {@link Predicate} that is {@code true} for elements that
 	 *            should be retained.

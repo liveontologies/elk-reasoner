@@ -114,6 +114,8 @@ public interface SaturationState<C extends Context> {
 
 	/**
 	 * @param contextModificationListener
+	 *            the {@link ContextModificationListener} that is used to
+	 *            report for changes in the saturation
 	 * @return a new {@link SaturationStateWriter} that can only modify
 	 *         {@link Context}s in this {@link SaturationState}, but cannot
 	 *         create new ones. When a {@link Context} is modified by the
@@ -146,7 +148,11 @@ public interface SaturationState<C extends Context> {
 
 	/**
 	 * @param contextCreationListener
+	 *            the {@link ContextCreationListener} that is used to report
+	 *            when {@link Context}s are created
 	 * @param contextModificationListener
+	 *            the {@link ContextModificationListener} that is used to report
+	 *            for changes in the saturation
 	 * @return a new {@link SaturationStateWriter} that can modify as well as
 	 *         create new {@link Context}s in this {@link SaturationState}. When
 	 *         a {@link Context} is modified by the
@@ -185,6 +191,7 @@ public interface SaturationState<C extends Context> {
 	 * {@link SaturationState}
 	 * 
 	 * @param listener
+	 *            a {@link ChangeListener} to be added
 	 * @return {@code true} if the operation was successful and {@code false}
 	 *         otherwise; if {@code false} is return, the listener was not
 	 *         registered
@@ -195,6 +202,7 @@ public interface SaturationState<C extends Context> {
 	 * Removes a given {@link ChangeListener} from this {@link SaturationState}
 	 * 
 	 * @param listener
+	 *            a {@link ChangeListener} to be removed
 	 * @return {@code true} if the operation was successful and {@code false}
 	 *         otherwise; if {@code false} is return, the listener was not
 	 *         removed
@@ -212,11 +220,13 @@ public interface SaturationState<C extends Context> {
 	public interface ChangeListener<C extends Context> {
 
 		/**
-		 * Is triggered immediately after a give context is added to the
-		 * {@link SaturationState}, i.e., it appears
+		 * Is triggered immediately after a given {@link Context} is added to
+		 * the {@link SaturationState}, i.e., it appears
 		 * {@link SaturationState#getContexts()}.
 		 * 
 		 * @param context
+		 *            the {@link Context} that was added
+		 * 
 		 */
 		void contextAddition(C context);
 
@@ -233,6 +243,7 @@ public interface SaturationState<C extends Context> {
 		 * {@link SaturationState#getNotSaturatedContexts()}.
 		 * 
 		 * @param context
+		 *            the {@link Context} that was marked as saturated
 		 */
 		void contextMarkedSaturated(C context);
 
@@ -242,12 +253,13 @@ public interface SaturationState<C extends Context> {
 		 * {@link SaturationState#getNotSaturatedContexts()}.
 		 * 
 		 * @param context
+		 *            the {@link Context} that was marked as non-saturated
 		 */
 		void contextMarkedNonSaturated(C context);
 		
 		
 		/**
-		 * Is triggered for a context of this {@link SaturationState} a
+		 * Is triggered for a {@link Context} of this {@link SaturationState} a
 		 * {@link ClassConclusion} with the same
 		 * {@link ClassConclusion#getTraceRoot()} as {@link Context#getRoot()}
 		 * has been added or removed while {@link Context#isSaturated()}
@@ -255,6 +267,8 @@ public interface SaturationState<C extends Context> {
 		 * updating the saturation after changes to the ontology.
 		 * 
 		 * @param context
+		 *            the {@link Context} for which the event was triggered
+		 * 
 		 */
 		void saturatedContextModified(C context);
 

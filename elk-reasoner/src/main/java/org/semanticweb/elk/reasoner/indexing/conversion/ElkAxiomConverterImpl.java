@@ -277,8 +277,8 @@ public class ElkAxiomConverterImpl extends NoOpElkAnnotationAxiomConverter<Void>
 	 *            the {@link OccurrenceListener} used to keep track of
 	 *            problematic occurrences of constructors
 	 * @param increment
-	 *            indicates whether the converted axioms must be inserted (> 0)
-	 *            or deleted (< 0) and with which multiplicity          
+	 *            indicates whether the converted axioms must be inserted {@code (> 0)}
+	 *            or deleted {@code (< 0)} and with which multiplicity          
 	 * @param producer
 	 *            a {@link Producer} used to record the conversion inferences
 	 */
@@ -324,8 +324,9 @@ public class ElkAxiomConverterImpl extends NoOpElkAnnotationAxiomConverter<Void>
 	 *            the {@link OccurrenceListener} used to keep track of
 	 *            problematic occurrences of constructors
 	 * @param increment
-	 *            indicates whether the converted axioms must be inserted (> 0)
-	 *            or deleted (< 0) and with which multiplicity
+	 *            indicates whether the converted axioms must be inserted
+	 *            {@code (> 0)} or deleted {@code (< 0)} and with which
+	 *            multiplicity
 	 * @param producer
 	 *            a {@link Producer} used to record the conversion inferences
 	 */

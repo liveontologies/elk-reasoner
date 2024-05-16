@@ -36,8 +36,10 @@ public class Conditions {
 	/**
 	 * 
 	 * @return a condition that always holds
+	 * @param <T>
+	 *            the type of elements to be used with this condition
 	 */
-	public static <T> Condition<T> trueCondition() {
+	public static <T> Condition<?> trueCondition() {
 		return new Condition<T>() {
 
 			@Override

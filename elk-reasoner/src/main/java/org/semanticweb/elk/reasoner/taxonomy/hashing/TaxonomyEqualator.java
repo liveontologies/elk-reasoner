@@ -43,6 +43,8 @@ public class TaxonomyEqualator {
 	 * have the same set of nodes, each of which has the same set of members,
 	 * super-nodes and sub-nodes.
 	 * 
+	 * @param <T>
+	 *            the type of the members of the taxonomy
 	 * @param taxonomy1
 	 *            The first taxonomy.
 	 * @param taxonomy2

@@ -40,12 +40,12 @@ import org.semanticweb.elk.reasoner.tracing.Conclusion.Factory;
  * {@link IndexedObjectSomeValuesFrom} from a {@link BackwardLink} and a
  * {@link Propagation}:<br>
  * 
- * <pre>
+ * <pre>{@code
  *   (1)                (2)
  *  C ⊑ <∃R>.[D]  ∃[R].[D] ⊑ ∃S.E
  * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
  *          [C] ⊑ +∃S.E
- * </pre>
+ * }</pre>
  * 
  * The parameters can be obtained as follows:<br>
  * 

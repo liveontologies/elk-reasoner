@@ -41,8 +41,11 @@ public class ConcurrentExecutors {
 	 * terminated.
 	 * 
 	 * @param name
+	 *            the name of the {@link ConcurrentExecutor}
 	 * @param timeout
+	 *            the termination timeout for running threads
 	 * @param unit
+	 *            the {@link TimeUnit} in which the timeout is measured
 	 * @return the {@link ConcurrentExecutor} associated with the given
 	 *         parameters
 	 */
@@ -58,6 +61,7 @@ public class ConcurrentExecutors {
 	 * thread is terminated.
 	 * 
 	 * @param name
+	 *            the name of the created {@link ConcurrentExecutor}
 	 * @return the {@link ConcurrentExecutor} associated with the given
 	 *         parameters
 	 */

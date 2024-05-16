@@ -33,7 +33,7 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 /**
  * Corresponds to an <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Enumeration_of_Individuals">Enumeration of
- * Individuals<a> in the OWL 2 specification.
+ * Individuals</a> in the OWL 2 specification.
  * 
  * @author Markus Kroetzsch
  */

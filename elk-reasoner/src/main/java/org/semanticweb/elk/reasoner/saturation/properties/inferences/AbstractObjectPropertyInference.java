@@ -44,8 +44,7 @@ abstract class AbstractObjectPropertyInference extends AbstractTracingInference
 	 * 
 	 * @return the conclusion produced by this inference
 	 */
-	abstract <F extends ObjectPropertyConclusion.Factory> Conclusion getConclusion(
-			F factory);
+	abstract Conclusion getConclusion(ObjectPropertyConclusion.Factory factory);
 
 //	@Override
 //	public final Conclusion getConclusion(Conclusion.Factory factory) {

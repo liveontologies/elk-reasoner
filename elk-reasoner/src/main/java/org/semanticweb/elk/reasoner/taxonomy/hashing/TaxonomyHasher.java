@@ -41,7 +41,8 @@ public class TaxonomyHasher {
 	 * Compute the hash code of a taxonomy.
 	 * 
 	 * @param taxonomy
-	 * @return hash
+	 *            the taxonomy for which to compute the hash
+	 * @return the resulting hash
 	 */
 	public static int hash(Taxonomy<? extends ElkEntity> taxonomy) {
 		return HashGenerator.combineMultisetHash(true, taxonomy.getNodes(), TaxonomyNodeHasher.INSTANCE);

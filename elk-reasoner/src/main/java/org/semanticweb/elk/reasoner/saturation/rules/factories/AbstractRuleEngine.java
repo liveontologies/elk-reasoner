@@ -33,11 +33,13 @@ import org.slf4j.LoggerFactory;
 /**
  * An engine to concurrently processing pending {@link ClassInference}s within
  * the corresponding {@link Context}s using a supplied
- * {@link ClassInference.Visitor}. The {@link ClassInference}s are retrieved
- * by {@link Context#takeToDo()}.
+ * {@link ClassInference.Visitor}. The {@link ClassInference}s are retrieved by
+ * {@link Context#takeToDo()}.
+ * 
+ * @param <I>
+ *            the type of the inputs to be processed by this engine
  * 
  * @author "Yevgeny Kazakov"
- * 
  */
 @SuppressWarnings("javadoc")
 public abstract class AbstractRuleEngine<I extends RuleApplicationInput>

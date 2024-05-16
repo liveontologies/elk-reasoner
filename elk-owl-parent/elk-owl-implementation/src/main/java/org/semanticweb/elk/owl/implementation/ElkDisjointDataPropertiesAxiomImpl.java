@@ -34,7 +34,7 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 /**
  * Corresponds to an <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Disjoint_Data_Properties">Disjoint Data
- * Properties Axiom<a> in the OWL 2 specification.
+ * Properties Axiom</a> in the OWL 2 specification.
  * 
  * @author Markus Kroetzsch
  */

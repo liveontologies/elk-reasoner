@@ -77,12 +77,17 @@ public class NativeRunner {
 	};
 
 	/**
-	 * Arguments are as follows: 0 - name of the reasoning task (SAT, query,
-	 * classification, consistency) 1 - ontology path 2 - output path 3 -
-	 * concept URI, in case of SAT
-	 * 
 	 * @param args
+	 *            List of arguments as follows:
+	 *            <ol>
+	 *            <li>name of the reasoning</li>
+	 *            <li>task (SAT, query, classification, consistency)</li>
+	 *            <li>ontology path</li>
+	 *            <li>output path</li>
+	 *            <li>concept URI, in case of SAT</li>
+	 *            </ol>
 	 * @throws Exception
+	 *             if something went wrong
 	 */
 	public static void main(String[] args) throws Exception {
 		Task task = validateArgs(args);

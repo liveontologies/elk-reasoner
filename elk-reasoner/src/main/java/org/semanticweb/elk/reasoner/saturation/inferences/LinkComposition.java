@@ -34,12 +34,12 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChai
  * A common interface for inferences with premises {@link BackwardLink},
  * {@link SubPropertyChain}, {@link ForwardLink} and {@link SubPropertyChain}:<br>
  * 
- * <pre>
+ * <pre>{@code
  *   (1)             (2)       (3)           (4)
  *  C ⊑ <∃R1>.[D]  R1 ⊑ R2  [D] ⊑ <∃P1>.E  P1 ⊑ P2  ...
  * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
  *                      ...
- * </pre>
+ * }</pre>
  * 
  * The parameters can be obtained as follows:<br>
  * 

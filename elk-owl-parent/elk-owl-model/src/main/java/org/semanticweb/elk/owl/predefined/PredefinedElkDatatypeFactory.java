@@ -26,8 +26,8 @@ import org.semanticweb.elk.owl.interfaces.ElkDatatype;
 
 /**
  * Factory for creating
- * <a href= "http://www.w3.org/TR/owl2-syntax/#Datatype_Maps">built-in datatypes
- * <a> in the OWL 2 specification.
+ * <a href= "http://www.w3.org/TR/owl2-syntax/#Datatype_Maps">built-in
+ * datatypes</a> in the OWL 2 specification.
  * 
  * @author "Yevgeny Kazakov"
  */

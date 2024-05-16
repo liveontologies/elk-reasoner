@@ -36,6 +36,7 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedSubObjectPropertyOfAxi
  * @author "Yevgeny Kazakov"
  *
  * @param <O>
+ *            the type of the output
  */
 public class DummyIndexedAxiomVisitor<O> implements IndexedAxiom.Visitor<O> {
 

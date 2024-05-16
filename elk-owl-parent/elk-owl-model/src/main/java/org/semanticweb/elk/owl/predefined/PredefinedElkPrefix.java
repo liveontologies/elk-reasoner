@@ -27,7 +27,7 @@ import org.semanticweb.elk.owl.iris.ElkPrefix;
 
 /**
  * Corresponds to <a href= "http://www.w3.org/TR/owl2-syntax/#IRIs" >Standard
- * prefix names<a> in OWL 2 (see Table 2 in the link).
+ * prefix names</a> in OWL 2 (see Table 2 in the link).
  * 
  * @author "Yevgeny Kazakov"
  *

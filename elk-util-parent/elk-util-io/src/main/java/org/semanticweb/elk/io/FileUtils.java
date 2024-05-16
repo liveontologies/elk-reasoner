@@ -66,6 +66,7 @@ public class FileUtils {
 
 	/**
 	 * @param filename
+	 *            the full path of the file
 	 * @return The file extension of the provided file name, or {@code null}
 	 *         when it does not have an extension. A file extension is a
 	 *         substring of the name starting immediately after the last

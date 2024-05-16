@@ -30,10 +30,10 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
  * existential restriction.<br>
  * 
  * Notation:
- * 
- * <pre>
+ *
+ * <pre>{@code
  * C ⊑ <∃P>.[D]
- * </pre>
+ * }</pre>
  * 
  * It is logically equivalent to axiom
  * {@code SubClassOf(C ObjectSomeValuesFrom(P D))}<br>

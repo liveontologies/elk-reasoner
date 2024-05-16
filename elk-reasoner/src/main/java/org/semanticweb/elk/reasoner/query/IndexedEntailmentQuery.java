@@ -55,14 +55,20 @@ public interface IndexedEntailmentQuery<E extends Entailment> {
 	 * it is not provable by the inferences from the returned proof.
 	 * 
 	 * @param atMostOne
-	 *            Whether at most one explanation should be returned.
+	 *            {@code true} to return at most one explanation and
+	 *            {@code false} to return all explanations
 	 * @param saturationState
+	 *            the {@linkplain SaturationState} from which the
+	 *            {@link SaturationConclusion}s are obtained
 	 * @param conclusionFactory
-	 * @return An evidence that the queried entailment is entailed.
+	 *            a {@link SaturationConclusion.Factory} to create conclusions
+	 *            used in the {@link Proof}
+	 * @return A {@link Proof} for this query.
 	 * @throws ElkQueryException
+	 *             if the explanation process fails
 	 */
-	<C extends Context> Proof<EntailmentInference> getEvidence(
-			boolean atMostOne, SaturationState<C> saturationState,
+	Proof<EntailmentInference> getEvidence(boolean atMostOne,
+			SaturationState<?> saturationState,
 			SaturationConclusion.Factory conclusionFactory)
 			throws ElkQueryException;
 

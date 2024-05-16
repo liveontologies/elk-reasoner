@@ -36,6 +36,7 @@ import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedSubObjectPro
  * @author Yevgeny Kazakov
  *
  * @param <O>
+ *            the type of the output
  */
 public class ModifiableIndexedAxiomDummyVisitor<O>
 		implements ModifiableIndexedAxiom.Visitor<O> {

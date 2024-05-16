@@ -30,7 +30,7 @@ import org.semanticweb.elk.owl.visitors.ElkObjectInverseOfVisitor;
 /**
  * Corresponds to an
  * <a href= "http://www.w3.org/TR/owl2-syntax/#Inverse_Object_Properties">
- * Inverse Object Property<a> in the OWL 2 specification.
+ * Inverse Object Property</a> in the OWL 2 specification.
  * 
  * @author Markus Kroetzsch
  */
@@ -48,6 +48,8 @@ public interface ElkObjectInverseOf extends ElkObjectPropertyExpression {
 	 * 
 	 * @param visitor
 	 *            the visitor that can work with this object type
+	 * @param <O>
+	 *            the type of the output of the visitor
 	 * @return the output of the visitor
 	 */
 	public <O> O accept(ElkObjectInverseOfVisitor<O> visitor);

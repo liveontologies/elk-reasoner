@@ -27,7 +27,7 @@ import org.semanticweb.elk.owl.visitors.ElkAnnotationAxiomVisitor;
 /**
  * Corresponds to an
  * <a href= "http://www.w3.org/TR/owl2-syntax/#Annotation_Axioms">Annotation
- * Axiom<a> in the OWL 2 specification. Annotation axioms do not have any
+ * Axiom</a> in the OWL 2 specification. Annotation axioms do not have any
  * logical meaning and can be safely ignored during reasoning. A (dummy)
  * implementation of annotation axioms is required to handle them more
  * gracefully during loading of OWL 2 ontologies.
@@ -42,6 +42,8 @@ public interface ElkAnnotationAxiom extends ElkAxiom {
 	 * 
 	 * @param visitor
 	 *            the visitor that can work with this axiom type
+	 * @param <O>
+	 *            the type of the output of the visitor
 	 * @return the output of the visitor
 	 */
 	public <O> O accept(ElkAnnotationAxiomVisitor<O> visitor);

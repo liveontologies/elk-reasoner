@@ -32,7 +32,7 @@ import org.semanticweb.elk.owl.visitors.ElkObjectPropertyChainVisitor;
 /**
  * Corresponds to an
  * <a href= "http://www.w3.org/TR/owl2-syntax/#Object_Subproperties">object
- * property chains<a> in the OWL 2 specification.
+ * property chains</a> in the OWL 2 specification.
  * 
  * @author Markus Kroetzsch
  */
@@ -52,6 +52,8 @@ public interface ElkObjectPropertyChain extends ElkSubObjectPropertyExpression {
 	 * 
 	 * @param visitor
 	 *            the visitor that can work with this object type
+	 * @param <O>
+	 *            the type of the output of the visitor
 	 * @return the output of the visitor
 	 */
 	public <O> O accept(ElkObjectPropertyChainVisitor<O> visitor);

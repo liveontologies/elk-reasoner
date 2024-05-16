@@ -95,9 +95,13 @@ public class TaxonomyNodeUtils {
 	}
 	
 	/**
-	 * Returns all super-nodes of a node whose direct super-nodes are
+	 * Returns all super-nodes of a node whose direct super-nodes are in
 	 * <code>direct</code>.
 	 * 
+	 * @param <N>
+	 *            The type of nodes
+	 * @param <T>
+	 *            The type of members of the nodes. 
 	 * @param direct
 	 *            The direct super-nodes.
 	 * @return all super-nodes of a node whose direct super-nodes are
@@ -117,6 +121,10 @@ public class TaxonomyNodeUtils {
 	 * Returns all sub-nodes of a node whose direct sub-nodes are
 	 * <code>direct</code>.
 	 * 
+	 * @param <N>
+	 *            The type of nodes
+	 * @param <T>
+	 *            The type of members of the nodes.
 	 * @param direct
 	 *            The direct sub-nodes.
 	 * @return all sub-nodes of a node whose direct sub-nodes are
@@ -135,7 +143,15 @@ public class TaxonomyNodeUtils {
 	/**
 	 * Returns all instance nodes of the specified type node and all its
 	 * sub-nodes.
-	 * 
+	 *
+	 * @param <TN>
+	 *            The type of type nodes
+	 * @param <IN>
+	 *            The type of instance nodes
+	 * @param <T>
+	 *            The type of members of the type nodes.
+	 * @param <I>
+	 *            The type of members of the instance nodes.
 	 * @param node
 	 *            The type node whose instances should be returned.
 	 * @return all instance nodes of the specified type node and all its

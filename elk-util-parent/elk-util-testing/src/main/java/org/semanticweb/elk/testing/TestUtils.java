@@ -89,8 +89,11 @@ public class TestUtils {
 
 	/**
 	 * @param input
+	 *            the path to test locations
 	 * @param inputDataLocation
+	 *            the location of the data
 	 * @param sortedIgnoredPaths
+	 *            the paths, alphabetically sorted
 	 * @return Whether the suffix of the path of the input URL starting at the
 	 *         last occurrence of the input data location is in sorted ignored
 	 *         paths.

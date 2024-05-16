@@ -40,6 +40,8 @@ public interface Chain<T extends ModifiableLink<T>> extends ModifiableLink<T> {
 	 * modified during calling of this function, the behavior of the function is
 	 * not specified.
 	 * 
+	 * @param <S>
+	 *            the output type of the {@link Matcher}
 	 * @param matcher
 	 *            the object describing an element to search for
 	 * @return the object contained in the chain that satisfies the provided
@@ -53,6 +55,8 @@ public interface Chain<T extends ModifiableLink<T>> extends ModifiableLink<T> {
 	 * {@link ReferenceFactory} and inserts it into the chain. In the letter
 	 * case, the chain is modified.
 	 * 
+	 * @param <S>
+	 *            the output type of the {@link Matcher}
 	 * @param matcher
 	 *            the object describing the element to search for
 	 * @param factory
@@ -68,6 +72,8 @@ public interface Chain<T extends ModifiableLink<T>> extends ModifiableLink<T> {
 	 * Removes the first element in the chain that satisfies the provided
 	 * {@link Matcher}. If such element is found, the chain is modified.
 	 * 
+	 * @param <S>
+	 *            the output type of the {@link Matcher}
 	 * @param descriptor
 	 *            the object describing the element to search for
 	 * @return the removed element, if found, or {@code null} if not found

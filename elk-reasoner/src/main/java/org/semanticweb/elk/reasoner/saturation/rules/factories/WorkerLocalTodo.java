@@ -37,7 +37,7 @@ import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 public interface WorkerLocalTodo {
 
 	/**
-	 * @return the next {@link ClassInference} in the queue or {@link null} if there
+	 * @return the next {@link ClassInference} in the queue or {@code null} if there
 	 *         is no such {@link ClassInference}
 	 */
 	ClassInference poll();
@@ -47,6 +47,7 @@ public interface WorkerLocalTodo {
 	 * {@link Context}
 	 * 
 	 * @param inference
+	 *            the {@link ClassInference} to be processed
 	 */
 	void add(ClassInference inference);
 

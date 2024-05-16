@@ -65,6 +65,8 @@ public class RootContextInitializationRule extends
 	 * {@link ModifiableOntologyIndex}
 	 * 
 	 * @param index
+	 *            a {@link ModifiableOntologyIndex} in which the rule should be
+	 *            added
 	 * @return {@code true} if the operation was successful and {@code false}
 	 *         otherwise; if {@code false} is returned, the index remains
 	 *         unchanged
@@ -78,6 +80,8 @@ public class RootContextInitializationRule extends
 	 * {@link ModifiableOntologyIndex}
 	 * 
 	 * @param index
+	 *            a {@link ModifiableOntologyIndex} in which the rule should be
+	 *            removed
 	 * @return {@code true} if the operation was successful and {@code false}
 	 *         otherwise; if {@code false} is returned, the index remains
 	 *         unchanged

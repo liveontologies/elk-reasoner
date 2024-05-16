@@ -30,7 +30,7 @@ import org.semanticweb.elk.owl.visitors.ElkObjectHasSelfVisitor;
 /**
  * Corresponds to a
  * <a href= "http://www.w3.org/TR/owl2-syntax/#Self-Restriction">Self-
- * Restriction<a> in the OWL 2 specification.
+ * Restriction</a> in the OWL 2 specification.
  * 
  * @author Markus Kroetzsch
  */
@@ -42,6 +42,8 @@ public interface ElkObjectHasSelf
 	 * 
 	 * @param visitor
 	 *            the visitor that can work with this object type
+	 * @param <O>
+	 *            the type of the output of the visitor
 	 * @return the output of the visitor
 	 */
 	public <O> O accept(ElkObjectHasSelfVisitor<O> visitor);

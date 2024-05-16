@@ -98,6 +98,8 @@ public class SuperClassFromSubClassRule extends AbstractChainableSubsumerRule {
 	/**
 	 * 
 	 * @param subsumer
+	 *            {@link IndexedClassExpression} for which to retrieve the
+	 *            resposible {@link ElkAxiom}
 	 * @return the {@link ElkAxiom} that is responsible for the given told
 	 *         subsumer or {@code null} if such an axiom does not exist
 	 */

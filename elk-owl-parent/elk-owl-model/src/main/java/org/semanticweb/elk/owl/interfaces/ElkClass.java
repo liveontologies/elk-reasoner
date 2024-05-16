@@ -30,8 +30,9 @@ import org.semanticweb.elk.owl.predefined.PredefinedElkClassFactory;
 import org.semanticweb.elk.owl.visitors.ElkClassVisitor;
 
 /**
- * Corresponds to a <a href= "http://www.w3.org/TR/owl2-syntax/#Classes">Class
- * <a> in the OWL 2 specification.
+ * Corresponds to a
+ * <a href= "http://www.w3.org/TR/owl2-syntax/#Classes">Class</a> in the OWL 2
+ * specification.
  * 
  * @author Markus Kroetzsch
  */
@@ -42,6 +43,8 @@ public interface ElkClass extends ElkClassExpression, ElkEntity {
 	 * 
 	 * @param visitor
 	 *            the visitor that can work with this object type
+	 * @param <O>
+	 *            the type of the output of the visitor           
 	 * @return the output of the visitor
 	 */
 	public <O> O accept(ElkClassVisitor<O> visitor);

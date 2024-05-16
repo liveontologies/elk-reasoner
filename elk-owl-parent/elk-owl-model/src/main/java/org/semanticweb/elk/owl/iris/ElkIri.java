@@ -86,6 +86,8 @@ public abstract class ElkIri implements Comparable<ElkIri>,
 	 * 
 	 * @param visitor
 	 *            the visitor that can work with this object type
+	 * @param <O>
+	 *            the type of the output of the visitor           
 	 * @return the output of the visitor
 	 */
 	public abstract <O> O accept(ElkIriVisitor<O> visitor);

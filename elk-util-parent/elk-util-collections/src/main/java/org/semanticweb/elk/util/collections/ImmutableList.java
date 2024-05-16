@@ -30,6 +30,7 @@ import java.util.Iterator;
  * @author "Yevgeny Kazakov"
  *
  * @param <E>
+ *            the elements contained in the list
  */
 public class ImmutableList<E> implements FList<E> {
 

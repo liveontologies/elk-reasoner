@@ -164,6 +164,7 @@ public class StatisticsPrinter {
 	 * given array may be modified, but the values themselves are not modified.
 	 * 
 	 * @param values
+	 *            the values to be printed
 	 */
 	public void print(Object... values) {
 		addPadding('.', values);

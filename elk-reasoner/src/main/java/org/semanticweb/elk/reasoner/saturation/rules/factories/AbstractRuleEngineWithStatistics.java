@@ -37,7 +37,9 @@ import org.semanticweb.elk.util.logging.CachedTimeThread;
  * 
  * @author "Yevgeny Kazakov"
  * 
- * @param <I> 
+ * @param <I>
+ *            the type of the inputs to be processed by this
+ *            {@link AbstractRuleEngine}
  */
 public abstract class AbstractRuleEngineWithStatistics<I extends RuleApplicationInput> extends
 		AbstractRuleEngine<I> {

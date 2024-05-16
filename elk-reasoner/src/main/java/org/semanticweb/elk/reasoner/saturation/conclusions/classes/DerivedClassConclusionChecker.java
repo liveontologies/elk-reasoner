@@ -66,6 +66,7 @@ public class DerivedClassConclusionChecker
 	 * be derived for the current ontology.
 	 * 
 	 * @param conclusion
+	 *            the {@link ClassConclusion} to be checked
 	 * @return {@code false} if conclusion cannot be derived for the current
 	 *         ontology. If {@code true} is returned, however, this still does
 	 *         not mean that conclusion is derivable.

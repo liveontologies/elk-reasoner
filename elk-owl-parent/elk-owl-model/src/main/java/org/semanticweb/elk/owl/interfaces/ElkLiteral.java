@@ -26,7 +26,7 @@ import org.semanticweb.elk.owl.visitors.ElkLiteralVisitor;
 
 /**
  * Corresponds to a
- * <a href="http://www.w3.org/TR/owl2-syntax/#Literals" >Literal<a> in the OWL 2
+ * <a href="http://www.w3.org/TR/owl2-syntax/#Literals">Literal</a> in the OWL 2
  * specification.
  * 
  * The OWL specification distinguishes three specific kinds of literals: typed
@@ -68,6 +68,8 @@ public interface ElkLiteral extends ElkObject, ElkAnnotationValue {
 	 * 
 	 * @param visitor
 	 *            the visitor that can work with this object type
+	 * @param <O>
+	 *            the type of the output of the visitor
 	 * @return the output of the visitor
 	 */
 	public <O> O accept(ElkLiteralVisitor<O> visitor);

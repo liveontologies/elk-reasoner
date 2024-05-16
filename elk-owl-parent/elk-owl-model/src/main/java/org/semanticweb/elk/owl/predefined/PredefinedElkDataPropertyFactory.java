@@ -27,7 +27,7 @@ import org.semanticweb.elk.owl.interfaces.ElkDataProperty;
 /**
  * Factory for creating
  * <a href= "http://www.w3.org/TR/owl2-syntax/#Data_Properties">built-in data
- * properties<a> in the OWL 2 specification, such as {@code owl:topDataProperty}
+ * properties</a> in the OWL 2 specification, such as {@code owl:topDataProperty}
  * and {@code owl:bottomDataProperty} .
  * 
  * @author "Yevgeny Kazakov"

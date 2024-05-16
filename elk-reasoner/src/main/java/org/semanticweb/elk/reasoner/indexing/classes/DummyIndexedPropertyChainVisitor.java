@@ -32,6 +32,7 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
  * @author "Yevgeny Kazakov"
  *
  * @param <O>
+ *            the type of the output
  */
 public class DummyIndexedPropertyChainVisitor<O> implements
 		IndexedPropertyChain.Visitor<O> {

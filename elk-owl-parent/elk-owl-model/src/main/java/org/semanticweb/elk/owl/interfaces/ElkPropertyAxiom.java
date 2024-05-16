@@ -46,6 +46,8 @@ public interface ElkPropertyAxiom<P> extends ElkAxiom {
 	 * 
 	 * @param visitor
 	 *            the visitor that can work with this axiom type
+	 * @param <O>
+	 *            the type of the output of the visitor
 	 * @return the output of the visitor
 	 */
 	public <O> O accept(ElkPropertyAxiomVisitor<O> visitor);

@@ -30,6 +30,7 @@ import org.semanticweb.elk.owl.visitors.ElkCardinalityRestrictionVisitor;
  * @author "Yevgeny Kazakov"
  * 
  * @param <P>
+ *            the type of the property of this expression
  */
 public interface ElkCardinalityRestriction<P>
 		extends ElkPropertyRestriction<P> {
@@ -44,6 +45,8 @@ public interface ElkCardinalityRestriction<P>
 	 * 
 	 * @param visitor
 	 *            the visitor that can work with this object type
+	 * @param <O>
+	 *            the type of the output of the visitor
 	 * @return the output of the visitor
 	 */
 	public <O> O accept(ElkCardinalityRestrictionVisitor<O> visitor);

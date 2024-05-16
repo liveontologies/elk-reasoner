@@ -31,7 +31,7 @@ import org.semanticweb.elk.owl.visitors.ElkDatatypeDefinitionAxiomVisitor;
 /**
  * Corresponds to a <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Datatype_Definitions">Datatype
- * Definitions<a> in the OWL 2 specification.
+ * Definitions</a> in the OWL 2 specification.
  * 
  * @author Pavel Klinov
  *
@@ -49,6 +49,8 @@ public interface ElkDatatypeDefinitionAxiom extends ElkAxiom {
 	 * 
 	 * @param visitor
 	 *            the visitor that can work with this axiom type
+	 * @param <O>
+	 *            the type of the output of the visitor
 	 * @return the output of the visitor
 	 */
 	public <O> O accept(ElkDatatypeDefinitionAxiomVisitor<O> visitor);

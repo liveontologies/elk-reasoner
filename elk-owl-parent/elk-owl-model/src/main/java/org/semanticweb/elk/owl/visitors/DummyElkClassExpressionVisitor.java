@@ -31,6 +31,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
  * @author "Yevgeny Kazakov"
  *
  * @param <O>
+ *            the type of the output of this visitor
  */
 public class DummyElkClassExpressionVisitor<O> extends
 		AbstractElkClassExpressionVisitor<O> {

@@ -42,6 +42,7 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedPredefinedClass;
  * @author "Yevgeny Kazakov"
  *
  * @param <O>
+ *            the type of the output
  */
 public class DummyIndexedClassExpressionVisitor<O> implements
 		IndexedClassExpression.Visitor<O> {

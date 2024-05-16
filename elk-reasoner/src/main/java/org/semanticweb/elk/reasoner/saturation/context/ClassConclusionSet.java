@@ -41,7 +41,7 @@ public interface ClassConclusionSet {
 	 * @param conclusion
 	 *            the {@link ClassConclusion} to be added
 	 * @return {@code true} if this {@link ClassConclusionSet} has changed as a
-	 *         result of this operation and {@link false} otherwise
+	 *         result of this operation and {@code false} otherwise
 	 */
 	boolean addConclusion(ClassConclusion conclusion);
 
@@ -51,7 +51,7 @@ public interface ClassConclusionSet {
 	 * @param conclusion
 	 *            the {@link ClassConclusion} to be removed
 	 * @return {@code true} if this {@link ClassConclusionSet} has changed as a
-	 *         result of this operation and {@link false} otherwise
+	 *         result of this operation and {@code false} otherwise
 	 */
 	boolean removeConclusion(ClassConclusion conclusion);
 
@@ -75,7 +75,8 @@ public interface ClassConclusionSet {
 	boolean isEmpty();
 
 	/**
-	 * @param subRoot  
+	 * @param subRoot
+	 *   the {@link IndexedObjectProperty} for which to perform the check 
 	 * @return {@code true} if the {@link SubClassConclusionSet} corresponding to the
 	 *         given subRoot {@link IndexedObjectProperty} does not contain any
 	 *         {@link SubClassConclusion}.

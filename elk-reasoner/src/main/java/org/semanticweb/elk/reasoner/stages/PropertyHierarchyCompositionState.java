@@ -109,6 +109,7 @@ public class PropertyHierarchyCompositionState {
 		 * <code>false</code>.
 		 * 
 		 * @param chain
+		 *            the {@link IndexedPropertyChain} which became saturated
 		 */
 		void propertyBecameSaturated(IndexedPropertyChain chain);
 
@@ -118,6 +119,8 @@ public class PropertyHierarchyCompositionState {
 		 * <code>true</code>.
 		 * 
 		 * @param chain
+		 *            the {@link IndexedPropertyChain} which became not
+		 *            saturated
 		 */
 		void propertyBecameNotSaturated(IndexedPropertyChain chain);
 
@@ -135,6 +138,7 @@ public class PropertyHierarchyCompositionState {
 		 * on the passer argument
 		 * 
 		 * @param chain
+		 *            the {@link IndexedPropertyChain} which became saturated
 		 */
 		void firePropertyBecameSaturated(IndexedPropertyChain chain);
 
@@ -144,6 +148,8 @@ public class PropertyHierarchyCompositionState {
 		 * the passer argument
 		 * 
 		 * @param chain
+		 *            the {@link IndexedPropertyChain} which became not
+		 *            saturated
 		 */
 		void firePropertyBecameNotSaturated(IndexedPropertyChain chain);
 

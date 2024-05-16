@@ -119,20 +119,22 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<configuration>
-					<show>public</show>
-					<executions>
-						<execution>
-							<id>aggregate</id>
-							<goals>
-								<goal>aggregate</goal>
-							</goals>
-							<phase>site</phase>
-						</execution>
-					</executions>
-					<maxmemory>2g</maxmemory>
-					<minmemory>128m</minmemory>
-				</configuration>
+				<reportSets>
+					<reportSet>
+						<id>aggregate</id>
+						<reports>
+							<report>aggregate</report>
+						</reports>
+						<configuration>
+							<show>public</show>
+							<maxmemory>2g</maxmemory>
+							<minmemory>128m</minmemory>
+							<sourceFileExcludes>
+								<sourceFileExclude>**/generated-sources/**/*.java</sourceFileExclude>
+							</sourceFileExcludes>
+						</configuration>
+					</reportSet>
+				</reportSets>
 			</plugin>
 		</plugins>
 	</reporting>

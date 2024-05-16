@@ -29,10 +29,10 @@ package org.semanticweb.elk.reasoner.taxonomy.model;
  * <p>
  * The way members of each node are hashed and compared is controlled by
  * {@link ComparatorKeyProvider} that is returned by {@link #getKeyProvider()}.
- * Each time {@link #hashCode()} or {@link #equals(Object)} needs to be computed
- * for a member, it is computed for its key returned by the key provider
- * instead. If two members need to be compared, the comparator returned by the
- * key provider is used.
+ * Each time {@link Object#hashCode()} or {@link Object#equals(Object)} needs to
+ * be computed for a member, it is computed for its key returned by the key
+ * provider instead. If two members need to be compared, the comparator returned
+ * by the key provider is used.
  * 
  * @author Markus Kroetzsch
  * @author "Yevgeny Kazakov"

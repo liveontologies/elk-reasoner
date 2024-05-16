@@ -31,6 +31,7 @@ import org.semanticweb.elk.owl.interfaces.ElkEntity;
  * @author "Yevgeny Kazakov"
  *
  * @param <O>
+ *            the output type of the visitor
  */
 public class DummyElkEntityVisitor<O> extends AbstractElkEntityVisitor<O> {
 

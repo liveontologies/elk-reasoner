@@ -29,7 +29,7 @@ import org.semanticweb.elk.owl.visitors.ElkDatatypeRestrictionVisitor;
 /**
  * Corresponds to an <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Datatype_Restrictions">Datatype
- * Restrictions<a> in the OWL 2 specification.
+ * Restrictions</a> in the OWL 2 specification.
  * 
  * @author Markus Kroetzsch
  */
@@ -54,6 +54,8 @@ public interface ElkDatatypeRestriction extends ElkDataRange {
 	 * 
 	 * @param visitor
 	 *            the visitor that can work with this object type
+	 * @param <O>
+	 *            the type of the output of the visitor
 	 * @return the output of the visitor
 	 */
 	public <O> O accept(ElkDatatypeRestrictionVisitor<O> visitor);

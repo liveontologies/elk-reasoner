@@ -30,7 +30,7 @@ import org.semanticweb.elk.owl.visitors.ElkNegativeDataPropertyAssertionAxiomVis
 /**
  * Corresponds to an <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Negative_Data_Property_Assertions" >
- * negative data property assertion axiom<a> in the OWL 2 specification.
+ * negative data property assertion axiom</a> in the OWL 2 specification.
  * 
  * @author Markus Kroetzsch
  * @author "Yevgeny Kazakov"
@@ -43,6 +43,8 @@ public interface ElkNegativeDataPropertyAssertionAxiom extends
 	 * 
 	 * @param visitor
 	 *            the visitor that can work with this axiom type
+	 * @param <O>
+	 *            the type of the output of the visitor
 	 * @return the output of the visitor
 	 */
 	public abstract <O> O accept(

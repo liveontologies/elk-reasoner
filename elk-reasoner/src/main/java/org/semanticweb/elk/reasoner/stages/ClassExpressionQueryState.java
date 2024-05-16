@@ -617,6 +617,7 @@ public class ClassExpressionQueryState implements ClassQueryLoader.Factory {
 
 	/**
 	 * @param classExpression
+	 *            the {@link ElkClassExpression} to be checked
 	 * @return whether the supplied class expression was indexed as a query.
 	 */
 	public boolean isIndexed(final ElkClassExpression classExpression) {
@@ -626,6 +627,7 @@ public class ClassExpressionQueryState implements ClassQueryLoader.Factory {
 
 	/**
 	 * @param classExpression
+	 *            the {@link ElkClassExpression} to be checked
 	 * @return whether the query result for the supplied class expression was
 	 *         already computed.
 	 */

@@ -34,6 +34,8 @@ package org.semanticweb.elk.reasoner.completeness;
  * @author Yevgeny Kazakov
  *
  * @param <R>
+ *            The type of the reasoning result for which the incompleteness
+ *            information is provided
  */
 public class IncompleteResult<R> {
 

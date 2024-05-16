@@ -30,7 +30,7 @@ import org.semanticweb.elk.owl.visitors.ElkObjectAllValuesFromVisitor;
 /**
  * Corresponds to an
  * <a href= "http://www.w3.org/TR/owl2-syntax/#Universal_Quantification">
- * Universal Quantification Object Property Restriction<a> in the OWL 2
+ * Universal Quantification Object Property Restriction</a> in the OWL 2
  * specification.
  * 
  * @author Markus Kroetzsch
@@ -43,6 +43,8 @@ public interface ElkObjectAllValuesFrom extends
 	 * 
 	 * @param visitor
 	 *            the visitor that can work with this object type
+	 * @param <O>
+	 *            the type of the output of the visitor
 	 * @return the output of the visitor
 	 */
 	public <O> O accept(ElkObjectAllValuesFromVisitor<O> visitor);

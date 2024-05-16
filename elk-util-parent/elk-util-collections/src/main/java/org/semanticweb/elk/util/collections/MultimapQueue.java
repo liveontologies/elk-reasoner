@@ -33,8 +33,11 @@ import java.util.Map;
  * @author Pavel Klinov
  *
  * pavel.klinov@uni-ulm.de
- * @param <Key> 
- * @param <Value> 
+ * 
+ * @param <Key>
+ *            the keys of the multimap
+ * @param <Value>
+ *            the values of the multimap 
  */
 public interface MultimapQueue<Key, Value> extends Multimap<Key, Value> {
 	

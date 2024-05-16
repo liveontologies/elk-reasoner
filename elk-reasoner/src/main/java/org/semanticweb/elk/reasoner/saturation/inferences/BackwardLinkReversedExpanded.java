@@ -36,12 +36,12 @@ import org.semanticweb.elk.reasoner.tracing.Conclusion.Factory;
  * A {@link ClassInference} producing a {@link BackwardLink} from a
  * {@link ForwardLink} and an {@link IndexedSubObjectPropertyOfAxiom}:<br>
  * 
- * <pre>
+ * <pre>{@code
  *      (1)         (2)
  *  [C] ⊑ <∃P>.D  [P ⊑ R]
  * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
  *       C ⊑ <∃R>.[D]
- * </pre>
+ * }</pre>
  * 
  * The parameters can be obtained as follows:<br>
  * 

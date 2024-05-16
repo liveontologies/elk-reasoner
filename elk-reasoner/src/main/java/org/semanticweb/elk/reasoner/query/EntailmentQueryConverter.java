@@ -244,9 +244,9 @@ public class EntailmentQueryConverter extends
 
 	/**
 	 * @param axiomClass
+	 *            a type of {@link ElkAxiom}s
 	 * @return {@code true} iff the entailment checking is supported for the
 	 *         {@link ElkAxiom} of the given type and {@code false} otherwise
-	 * 
 	 */
 	public static boolean isEntailmentCheckingSupported(
 			final Class<? extends ElkAxiom> axiomClass) {

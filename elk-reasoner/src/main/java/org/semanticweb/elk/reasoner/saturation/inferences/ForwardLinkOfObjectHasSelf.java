@@ -38,11 +38,11 @@ import org.semanticweb.elk.reasoner.tracing.Conclusion.Factory;
  * {@link SubClassInclusionDecomposed#getSubsumer()} of the type
  * {@link IndexedObjectHasSelf}:<br>
  * 
- * <pre>
+ * <pre>{@code
  *  [C] ⊑ -∃R.Self
  * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
  *  [C] ⊑ <∃R>.C
- * </pre>
+ * }</pre>
  * 
  * The parameters can be obtained as follows:<br>
  * 

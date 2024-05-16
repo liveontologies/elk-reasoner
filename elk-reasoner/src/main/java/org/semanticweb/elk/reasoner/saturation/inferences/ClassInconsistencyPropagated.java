@@ -36,12 +36,12 @@ import org.semanticweb.elk.reasoner.tracing.Conclusion.Factory;
  * A {@link ClassInference} producing a {@link ClassInconsistency} from a
  * {@link BackwardLink} and another {@link ClassInconsistency}:<br>
  * 
- * <pre>
+ * <pre>{@code
  *   (1)             (2)
  *  C ⊑ <∃R>.[D]  [D] ⊑ 0  
  * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
  *        [C] ⊑ 0
- * </pre>
+ * }</pre>
  * 
  * The parameters can be obtained as follows:<br>
  * 

@@ -141,15 +141,18 @@ public interface ModifiableOntologyIndex
 	 * changes of occurrences maintained by this index.
 	 * 
 	 * @param listener
+	 *            the {@link OccurrenceListener} to be added
+	 * 
 	 */
 	void addOccurrenceListener(OccurrenceListener listener);
 
 	/**
 	 * Removes the given {@link OccurrenceListener} from this
-	 * {@link ModifiableOntologyIndex}. After the removal, the listener will no longer receive notifications
-	 * about the changes of occurrences.
+	 * {@link ModifiableOntologyIndex}. After the removal, the listener will no
+	 * longer receive notifications about the changes of occurrences.
 	 * 
 	 * @param listener
+	 *            the {@link OccurrenceListener} to be removed
 	 */
 	void removeOccurrenceListener(OccurrenceListener listener);
 	

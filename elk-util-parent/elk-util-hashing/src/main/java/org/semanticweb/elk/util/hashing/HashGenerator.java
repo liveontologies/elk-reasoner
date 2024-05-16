@@ -129,17 +129,18 @@ public class HashGenerator {
 	 * combined with other hash codes for getting the same result as if all hash
 	 * codes had been combined in one step.
 	 * 
-	 * If finalize is false, then the method as such represents an associative
-	 * commutative hash, i.e. the return value can be combined with other
-	 * set-based hash codes in any order without making a difference. If
-	 * finalize is true, then the method combines its arguments with a
-	 * commutative hash, but shuffles the overall result. The method as such
-	 * then is neither an associative nor a commutative operation. This mode of
-	 * operation should be used whenever no further elements are to be added to
-	 * the set of hashes.
-	 * 
 	 * @param finalize
+	 *            if {@code false}, then the method as such represents an
+	 *            associative commutative hash, i.e. the return value can be
+	 *            combined with other set-based hash codes in any order without
+	 *            making a difference. If {@code true}, then the method combines
+	 *            its arguments with a commutative hash, but shuffles the
+	 *            overall result. The method as such then is neither an
+	 *            associative nor a commutative operation. This mode of
+	 *            operation should be used whenever no further elements are to
+	 *            be added to the set of hashes.
 	 * @param hashes
+	 *            the hash values to be combined
 	 * @return the combined hash code
 	 */
 	public static int combineMultisetHash(boolean finalize, int... hashes) {
@@ -159,18 +160,22 @@ public class HashGenerator {
 	 * functions can be further combined with other hash codes for getting the
 	 * same result as if all hash codes had been combined in one step.
 	 * 
-	 * If finalize is false, then the method as such represents an associative
-	 * commutative hash, i.e. the return value can be combined with other
-	 * set-based hash codes in any order without making a difference. If
-	 * finalize is true, then the method combines its arguments with a
-	 * commutative hash, but shuffles the overall result. The method as such
-	 * then is neither an associative nor a commutative operation. This mode of
-	 * operation should be used whenever no further elements are to be added to
-	 * the set of hashes.
-	 * 
+	 * @param <T>
+	 *            the type of objects to be hashed
 	 * @param finalize
+	 *            if {@code false}, then the method as such represents an
+	 *            associative commutative hash, i.e. the return value can be
+	 *            combined with other set-based hash codes in any order without
+	 *            making a difference. If {@code true}, then the method combines
+	 *            its arguments with a commutative hash, but shuffles the
+	 *            overall result. The method as such then is neither an
+	 *            associative nor a commutative operation. This mode of
+	 *            operation should be used whenever no further elements are to
+	 *            be added to the set of hashes.
 	 * @param hashObjects
+	 *            the objects for which to combine the hash codes
 	 * @param hasher
+	 *            the {@link Hasher} using which the hash codes are computed
 	 * @return the combined hash code
 	 */
 	public static <T> int combineMultisetHash(boolean finalize,
@@ -184,20 +189,23 @@ public class HashGenerator {
 	 * functions can be further combined with other hash codes for getting the
 	 * same result as if all hash codes had been combined in one step.
 	 * 
-	 * If finalize is false, then the method as such represents an associative
-	 * commutative hash, i.e. the return value can be combined with other
-	 * set-based hash codes in any order without making a difference. If
-	 * finalize is true, then the method combines its arguments with a
-	 * commutative hash, but shuffles the overall result. The method as such
-	 * then is neither an associative nor a commutative operation. This mode of
-	 * operation should be used whenever no further elements are to be added to
-	 * the set of hashes.
-	 * 
 	 * @param <T>
+	 *            the type of objects to be hashed
 	 * 
 	 * @param finalize
+	 *            If {@code false}, then the method as such represents an
+	 *            associative commutative hash, i.e. the return value can be
+	 *            combined with other set-based hash codes in any order without
+	 *            making a difference. If {@code true}, then the method combines
+	 *            its arguments with a commutative hash, but shuffles the
+	 *            overall result. The method as such then is neither an
+	 *            associative nor a commutative operation. This mode of
+	 *            operation should be used whenever no further elements are to
+	 *            be added to the set of hashes.
 	 * @param hashObjectIterator
+	 *            the objects for which to combine the hash codes
 	 * @param hasher
+	 *            the {@link Hasher} using which the hash codes are computed
 	 * @return the combined hash code
 	 */
 	public static <T> int combineMultisetHash(boolean finalize,
@@ -220,6 +228,7 @@ public class HashGenerator {
 	 * http://en.wikipedia.org/wiki/Jenkins_hash_function.
 	 * 
 	 * @param hashes
+	 *            the hash codes to be combined
 	 * @return the combined hash code
 	 */
 	public static int combineListHash(int... hashes) {
@@ -244,8 +253,12 @@ public class HashGenerator {
 	 * see http://www.burtleburtle.net/bob/hash/doobs.html and also
 	 * http://en.wikipedia.org/wiki/Jenkins_hash_function.
 	 * 
+	 * @param <T>
+	 *            the type of objects to be hashed
 	 * @param hashObjects
+	 *            the objects for which to combine the hash codes
 	 * @param hasher
+	 *            the {@link Hasher} using which the hash codes are computed
 	 * @return the combined hash code
 	 */
 	public static <T> int combineListHash(List<? extends T> hashObjects,
@@ -261,8 +274,12 @@ public class HashGenerator {
 	 * see http://www.burtleburtle.net/bob/hash/doobs.html and also
 	 * http://en.wikipedia.org/wiki/Jenkins_hash_function.
 	 * 
+	 * @param <T>
+	 *            the type of objects to be hashed
 	 * @param hashObjectIterator
+	 *            the objects for which to combine the hash codes
 	 * @param hasher
+	 *            the {@link Hasher} using which the hash codes are computed
 	 * @return the combined hash code
 	 */
 	public static <T> int combineListHash(

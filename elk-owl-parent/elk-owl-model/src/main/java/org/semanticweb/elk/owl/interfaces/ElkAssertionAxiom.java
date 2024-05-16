@@ -29,7 +29,7 @@ import org.semanticweb.elk.owl.visitors.ElkAssertionAxiomVisitor;
 
 /**
  * Corresponds to a
- * <a href= "http://www.w3.org/TR/owl2-syntax/#Assertions">Assertions<a> in the
+ * <a href= "http://www.w3.org/TR/owl2-syntax/#Assertions">Assertions</a> in the
  * OWL 2 specification.
  * 
  * @author Markus Kroetzsch
@@ -41,6 +41,8 @@ public interface ElkAssertionAxiom extends ElkAxiom {
 	 * 
 	 * @param visitor
 	 *            the visitor that can work with this axiom type
+	 * @param <O>
+	 *            the type of the output of the visitor           
 	 * @return the output of the visitor
 	 */
 	public <O> O accept(ElkAssertionAxiomVisitor<O> visitor);

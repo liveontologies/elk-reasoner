@@ -33,7 +33,7 @@ import org.semanticweb.elk.owl.visitors.ElkDatatypeDefinitionAxiomVisitor;
 import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 
 /**
- * Implementation of <@link ElkDatatypeDefinitionAxiom>
+ * Implementation of {@link ElkDatatypeDefinitionAxiom}
  * 
  * @author Pavel Klinov
  * 

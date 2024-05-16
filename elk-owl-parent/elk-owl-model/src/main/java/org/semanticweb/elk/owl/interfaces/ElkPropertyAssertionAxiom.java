@@ -58,6 +58,8 @@ public interface ElkPropertyAssertionAxiom<P, S, O>
 	 * 
 	 * @param visitor
 	 *            the visitor that can work with this axiom type
+	 * @param <T>
+	 *            the type of the output of the visitor           
 	 * @return the output of the visitor
 	 */
 	public <T> T accept(ElkPropertyAssertionAxiomVisitor<T> visitor);

@@ -150,6 +150,9 @@ public class ContextImpl implements ExtendedContext {
 	 * Initially, the context is not active.
 	 * 
 	 * @param root
+	 *            the {@link IndexedContextRoot} for which to construct the
+	 *            {@link Context}
+	 * @see Context#getRoot()
 	 */
 	public ContextImpl(IndexedContextRoot root) {
 		this.root_ = root;

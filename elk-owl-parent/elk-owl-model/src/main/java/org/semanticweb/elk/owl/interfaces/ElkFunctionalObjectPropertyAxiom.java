@@ -30,7 +30,7 @@ import org.semanticweb.elk.owl.visitors.ElkFunctionalObjectPropertyAxiomVisitor;
 /**
  * Corresponds to a
  * <a href= "http://www.w3.org/TR/owl2-syntax/#Functional_Object_Properties">
- * Functional Object Property Axiom<a> in the OWL 2 specification.
+ * Functional Object Property Axiom</a> in the OWL 2 specification.
  * 
  * @author Markus Kroetzsch
  * @author "Yevgeny Kazakov"
@@ -43,6 +43,8 @@ public interface ElkFunctionalObjectPropertyAxiom extends
 	 * 
 	 * @param visitor
 	 *            the visitor that can work with this axiom type
+	 * @param <O>
+	 *            the type of the output of the visitor
 	 * @return the output of the visitor
 	 */
 	public abstract <O> O accept(

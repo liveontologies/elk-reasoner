@@ -49,10 +49,6 @@ import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
  */
 public class RetrievingInstances {
 
-	/**
-	 * @param args
-	 * @throws OWLOntologyCreationException
-	 */
 	public static void main(String[] args) throws OWLOntologyCreationException {
 		OWLOntologyManager man = OWLManager.createOWLOntologyManager();
 

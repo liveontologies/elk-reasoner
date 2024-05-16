@@ -38,13 +38,16 @@ public interface OccurrenceManager extends OccurrenceCounter {
 	 * may include the the number of its occurrences or details about some
 	 * recent occurrences
 	 * 
-	 * @param feature
+	 * @param occurrence
+	 *            the {@link Feature} for which to retrieve the information
 	 * @param logger
+	 *            the {@link Logger} used to print the message
 	 */
-	void logOccurrences(Feature feature, Logger logger);
+	void logOccurrences(Feature occurrence, Logger logger);
 
 	/**
 	 * @param occurrence
+	 *            the {@link Feature} for which to retrieve the information
 	 * @return {@code true} if some new occurrences of the given {@link Feature}
 	 *         may have appeared after the last call of
 	 *         {@link #logOccurrences(Feature, Logger)}, and {@code false}

@@ -37,6 +37,7 @@ public interface Chainable<T extends ModifiableLink<T>> extends
 	 * Adds this element to the given {@link Chain}
 	 * 
 	 * @param chain
+	 *            the {@link Chain} where to add this element
 	 * @return {@code true} if the operation was successful and {@code false}
 	 *         otherwise; if {@code false} is returned, this {@link Chain}
 	 *         remains unchanged

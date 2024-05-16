@@ -30,7 +30,7 @@ import org.semanticweb.elk.owl.visitors.ElkDataHasValueVisitor;
 /**
  * Corresponds to an <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Literal_Value_Restriction">Literal Value
- * Restriction for Data Properties<a> in the OWL 2 specification.
+ * Restriction for Data Properties</a> in the OWL 2 specification.
  * 
  * @author Markus Kroetzsch
  */
@@ -42,6 +42,8 @@ public interface ElkDataHasValue extends
 	 * 
 	 * @param visitor
 	 *            the visitor that can work with this object type
+	 * @param <O>
+	 *            the type of the output of the visitor
 	 * @return the output of the visitor
 	 */
 	public <O> O accept(ElkDataHasValueVisitor<O> visitor);

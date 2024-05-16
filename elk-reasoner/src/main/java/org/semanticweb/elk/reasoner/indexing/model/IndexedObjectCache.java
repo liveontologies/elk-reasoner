@@ -102,9 +102,11 @@ public interface IndexedObjectCache {
 	public IndexedObjectProperty getOwlBottomObjectProperty();
 
 	/**
-	 * Registers a given {@link ChangeListener} with this {@link IndexedObjectCache}
+	 * Registers a given {@link ChangeListener} with this
+	 * {@link IndexedObjectCache}
 	 * 
 	 * @param listener
+	 *            a {@link ChangeListener} to be added
 	 * @return {@code true} if the operation was successful and {@code false}
 	 *         otherwise; if {@code false} is return, the listener was not
 	 *         registered
@@ -115,6 +117,7 @@ public interface IndexedObjectCache {
 	 * Removes a given {@link ChangeListener} from this {@link IndexedObjectCache}
 	 * 
 	 * @param listener
+	 *            a {@link ChangeListener} to be removed
 	 * @return {@code true} if the operation was successful and {@code false}
 	 *         otherwise; if {@code false} is return, the listener was not
 	 *         removed

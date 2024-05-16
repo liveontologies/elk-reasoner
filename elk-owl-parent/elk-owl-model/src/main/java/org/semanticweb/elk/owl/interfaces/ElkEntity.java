@@ -33,7 +33,7 @@ import org.semanticweb.elk.owl.visitors.ElkEntityVisitor;
 /**
  * Corresponds to an <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Entities.2C_Literals.2C_and_Anonymous_Individuals"
- * >Entity<a> in the OWL 2 specification.
+ * >Entity</a> in the OWL 2 specification.
  * 
  * @author Markus Kroetzsch
  */
@@ -54,6 +54,8 @@ public interface ElkEntity extends ElkObject {
 	 * 
 	 * @param visitor
 	 *            the visitor that can work with this object type
+	 * @param <O>
+	 *            the type of the output of the visitor
 	 * @return the output of the visitor
 	 */
 	public <O> O accept(ElkEntityVisitor<O> visitor);

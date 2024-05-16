@@ -34,9 +34,12 @@ import org.semanticweb.elk.reasoner.saturation.context.Context;
 public interface ContextModificationListener {
 
 	/**
-	 * Invoked right after the context has been marked as saturated or not saturated
-	 * @param context 
-	 */
+	 * Invoked right after the context has been marked as saturated or not
+	 * saturated
+	 * 
+	 * @param context
+	 *            the {@link Context} whose saturation flag has changed
+	 */ 
 	public void notifyContextModification(Context context);
 	
 	public static final ContextModificationListener DUMMY = new ContextModificationListener() {

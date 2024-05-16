@@ -34,6 +34,15 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
  */
 public interface ElkObject {
 
+	/**
+	 * Accept an {@link ElkObjectVisitor}.
+	 * 
+	 * @param visitor
+	 *            the visitor that can work with this object type
+	 * @param <O>
+	 *            the type of the output of the visitor
+	 * @return the output of the visitor
+	 */
 	public <O> O accept(ElkObjectVisitor<O> visitor);
 
 	/**

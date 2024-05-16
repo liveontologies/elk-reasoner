@@ -36,7 +36,9 @@ import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
  * 
  * @author "Yevgeny Kazakov"
  * 
- * @param <I> 
+ * @param <I>
+ *            the type of the inputs to be processed by this
+ *            {@link AbstractRuleEngine}
  */
 public class BasicRuleEngine<I extends RuleApplicationInput>
 		extends

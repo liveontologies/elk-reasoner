@@ -34,9 +34,12 @@
 
 options
 {
+  GENERATE_GENERICS = true;
+  GENERATE_ANNOTATIONS = true;
   UNICODE_INPUT = true;
 //  CACHE_TOKENS = true;
   STATIC = false;
+  SUPPORT_CLASS_VISIBILITY_PUBLIC = false;
 }
 
 PARSER_BEGIN(AbstractOwl2FunctionalStyleParser)
@@ -109,7 +112,6 @@ import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectAllValuesFrom;
 import org.semanticweb.elk.owl.interfaces.ElkObjectComplementOf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectExactCardinality;
-import org.semanticweb.elk.owl.interfaces.ElkObject.Factory;
 import org.semanticweb.elk.owl.interfaces.ElkObjectHasSelf;
 import org.semanticweb.elk.owl.interfaces.ElkObjectHasValue;
 import org.semanticweb.elk.owl.interfaces.ElkObjectIntersectionOf;
@@ -146,7 +148,7 @@ import org.semanticweb.elk.owl.parsing.Owl2ParseException;
 import org.semanticweb.elk.owl.parsing.Owl2Parser;
 import org.semanticweb.elk.owl.parsing.Owl2ParserAxiomProcessor;
 
-public abstract class AbstractOwl2FunctionalStyleParser implements Owl2Parser {
+abstract class AbstractOwl2FunctionalStyleParser implements Owl2Parser {
 
 	/**
 	 * Get prefix declarations to resolve IRIs.

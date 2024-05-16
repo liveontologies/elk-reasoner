@@ -31,7 +31,7 @@ import org.semanticweb.elk.owl.visitors.ElkAnnotationPropertyRangeAxiomVisitor;
 /**
  * Corresponds to an
  * <a href= "http://www.w3.org/TR/owl2-syntax/#Annotation_Property_Range">
- * Annotation Property Range<a> in the OWL 2 specification.
+ * Annotation Property Range</a> in the OWL 2 specification.
  * 
  * @author Frantisek Simancik
  *
@@ -44,6 +44,8 @@ public interface ElkAnnotationPropertyRangeAxiom extends ElkAnnotationAxiom,
 	 * 
 	 * @param visitor
 	 *            the visitor that can work with this axiom type
+	 * @param <O>
+	 *            the type of the output of the visitor           
 	 * @return the output of the visitor
 	 */
 	public <O> O accept(ElkAnnotationPropertyRangeAxiomVisitor<O> visitor);

@@ -28,7 +28,7 @@ import org.semanticweb.elk.owl.visitors.ElkFacetRestrictionVisitor;
 /**
  * Corresponds to a pair of constraining facet and restriction value as used in
  * <a href= "http://www.w3.org/TR/owl2-syntax/#Datatype_Restrictions">OWL 2
- * Datatype Restrictions<a>.
+ * Datatype Restrictions</a>.
  * 
  * @author Markus Kroetzsch
  */
@@ -53,6 +53,8 @@ public interface ElkFacetRestriction extends ElkObject {
 	 * 
 	 * @param visitor
 	 *            the visitor that can work with this object type
+	 * @param <O>
+	 *            the type of the output of the visitor
 	 * @return the output of the visitor
 	 */
 	public <O> O accept(ElkFacetRestrictionVisitor<O> visitor);

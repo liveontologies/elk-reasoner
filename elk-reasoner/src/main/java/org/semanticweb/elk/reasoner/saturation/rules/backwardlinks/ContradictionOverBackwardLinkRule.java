@@ -51,6 +51,7 @@ public class ContradictionOverBackwardLinkRule extends
 	 * {@link BackwardLinkRule}s of the given {@link Context}
 	 * 
 	 * @param context
+	 *            the {@link Context} in which this rule should be added
 	 */
 	public static void addTo(Context context) {
 		context.getBackwardLinkRuleChain().getCreate(MATCHER_, FACTORY_);
@@ -61,6 +62,7 @@ public class ContradictionOverBackwardLinkRule extends
 	 * {@link BackwardLinkRule}s of the given {@link Context}
 	 * 
 	 * @param context
+	 *            the {@link Context} from which this rule should be removed
 	 */
 	public static void removeFrom(Context context) {
 		context.getBackwardLinkRuleChain().remove(MATCHER_);

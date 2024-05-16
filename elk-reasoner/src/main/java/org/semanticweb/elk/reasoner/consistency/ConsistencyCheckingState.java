@@ -194,9 +194,14 @@ public class ConsistencyCheckingState {
 
 	/**
 	 * @param saturationState
-	 * @param propertHierarchyState 
+	 *            a {@link SaturationState} containing information about derived
+	 *            class axioms
+	 * @param propertHierarchyState
+	 *            a {@link PropertyHierarchyCompositionState} containing
+	 *            information about derived property axioms
+	 * 
 	 * @return a new {@link ConsistencyCheckingState} associated with the given
-	 *         {@link SaturationState}
+	 *         {@link SaturationState} and {@link PropertyHierarchyCompositionState}
 	 */
 	public static ConsistencyCheckingState create(
 			SaturationState<?> saturationState,

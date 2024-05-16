@@ -32,7 +32,7 @@ import org.semanticweb.elk.owl.visitors.ElkDataOneOfVisitor;
 /**
  * Corresponds to an
  * <a href= "http://www.w3.org/TR/owl2-syntax/#Enumeration_of_Literals">
- * Enumeration of Literals<a> in the OWL 2 specification.
+ * Enumeration of Literals</a> in the OWL 2 specification.
  * 
  * @author Markus Kroetzsch
  */
@@ -52,6 +52,8 @@ public interface ElkDataOneOf extends ElkDataRange {
 	 * 
 	 * @param visitor
 	 *            the visitor that can work with this object type
+	 * @param <O>
+	 *            the type of the output of the visitor
 	 * @return the output of the visitor
 	 */
 	public <O> O accept(ElkDataOneOfVisitor<O> visitor);

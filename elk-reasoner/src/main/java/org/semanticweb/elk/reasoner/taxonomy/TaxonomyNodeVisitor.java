@@ -35,7 +35,8 @@ import org.semanticweb.elk.reasoner.taxonomy.model.TaxonomyNode;
  *
  * pavel.klinov@uni-ulm.de
  * 
- * @param <T> 
+ * @param <T>
+ *            the type of objects stored in the nodes 
  */
 public interface TaxonomyNodeVisitor<T extends ElkEntity> {
 

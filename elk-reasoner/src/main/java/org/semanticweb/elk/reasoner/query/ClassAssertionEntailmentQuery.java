@@ -82,8 +82,8 @@ public class ClassAssertionEntailmentQuery
 	}
 
 	@Override
-	public <C extends Context> Proof<EntailmentInference> getEvidence(
-			final boolean atMostOne, final SaturationState<C> saturationState,
+	public Proof<EntailmentInference> getEvidence(final boolean atMostOne,
+			final SaturationState<?> saturationState,
 			final SaturationConclusion.Factory conclusionFactory)
 			throws ElkQueryException {
 		return new Proof<EntailmentInference>() {
@@ -97,7 +97,7 @@ public class ClassAssertionEntailmentQuery
 				}
 				// else
 
-				final C context = saturationState.getContext(individual_);
+				final Context context = saturationState.getContext(individual_);
 				if (context == null) {
 					// not entailed
 					return Collections.emptySet();

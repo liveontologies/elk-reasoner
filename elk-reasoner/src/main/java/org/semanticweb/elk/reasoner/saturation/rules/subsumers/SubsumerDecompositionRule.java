@@ -30,12 +30,14 @@ import org.semanticweb.elk.reasoner.saturation.context.ContextPremises;
 import org.semanticweb.elk.reasoner.saturation.rules.ClassInferenceProducer;
 
 /**
- * A decomposition rules for {@link SubClassInclusion}s. The rule typically does not
- * depend on the other {@link ClassConclusion}s stored in the {@link Context}
+ * A decomposition rules for {@link SubClassInclusion}s. The rule typically does
+ * not depend on the other {@link ClassConclusion}s stored in the
+ * {@link Context}
  * 
  * @author "Yevgeny Kazakov"
  * 
  * @param <P>
+ *            the type of premises to which the rule can be applied
  */
 public interface SubsumerDecompositionRule<P extends IndexedClassExpression>
 		extends SubsumerRule<P> {

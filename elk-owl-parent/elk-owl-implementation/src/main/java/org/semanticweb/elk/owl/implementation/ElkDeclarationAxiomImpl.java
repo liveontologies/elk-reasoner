@@ -34,7 +34,7 @@ import org.semanticweb.elk.owl.visitors.ElkObjectVisitor;
 /**
  * Corresponds to a <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Entity_Declarations_and_Typing"
- * >Declaration Axiom<a> in the OWL 2 specification.
+ * >Declaration Axiom</a> in the OWL 2 specification.
  * 
  * @author Yevgeny Kazakov
  * @author Markus Kroetzsch

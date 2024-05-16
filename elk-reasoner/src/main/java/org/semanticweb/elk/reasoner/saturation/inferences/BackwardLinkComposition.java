@@ -42,12 +42,12 @@ import org.semanticweb.elk.reasoner.tracing.Conclusion.Factory;
  * {@link BackwardLink}, {@link SubPropertyChain}, {@link ForwardLink},
  * {@link SubPropertyChain}, and a {@link IndexedSubObjectPropertyOfAxiom}:<br>
  * 
- * <pre>
+ * <pre>{@code
  *   (1)             (2)       (3)           (4)         (5)
  *  C ⊑ <∃R1>.[D]  R1 ⊑ R2  [D] ⊑ <∃P1>.E  P1 ⊑ P2  [R2P2 ⊑ R]
  * ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
  *                      C ⊑ <∃R>.[E]
- * </pre>
+ * }</pre>
  * 
  * The parameters can be obtained as follows:<br>
  * 

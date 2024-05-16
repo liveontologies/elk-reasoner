@@ -30,7 +30,7 @@ import org.semanticweb.elk.owl.visitors.ElkDeclarationAxiomVisitor;
 /**
  * Corresponds to a <a href=
  * "http://www.w3.org/TR/owl2-syntax/#Entity_Declarations_and_Typing"
- * >Declaration Axiom<a> in the OWL 2 specification.
+ * >Declaration Axiom</a> in the OWL 2 specification.
  * 
  * @author Markus Kroetzsch
  * 
@@ -49,6 +49,8 @@ public interface ElkDeclarationAxiom extends ElkAxiom {
 	 * 
 	 * @param visitor
 	 *            the visitor that can work with this axiom type
+	 * @param <O>
+	 *            the type of the output of the visitor
 	 * @return the output of the visitor
 	 */
 	public <O> O accept(ElkDeclarationAxiomVisitor<O> visitor);

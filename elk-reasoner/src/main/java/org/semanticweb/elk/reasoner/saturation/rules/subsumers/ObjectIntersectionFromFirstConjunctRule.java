@@ -70,7 +70,10 @@ public class ObjectIntersectionFromFirstConjunctRule extends
 	 * {@link ModifiableOntologyIndex}
 	 * 
 	 * @param conjunction
+	 *            the {@link ModifiableIndexedObjectIntersectionOf} for which to
+	 *            add the rule
 	 * @param index
+	 *            the {@link ModifiableOntologyIndex} into which to add the rule
 	 * @return {@code true} if the operation is successful and {@code false} if
 	 *         not; if {@code false} is return, the index remains unchanged
 	 */
@@ -89,7 +92,11 @@ public class ObjectIntersectionFromFirstConjunctRule extends
 	 * {@link ModifiableOntologyIndex}
 	 * 
 	 * @param conjunction
+	 *            the {@link ModifiableIndexedObjectIntersectionOf} for which to
+	 *            remove the rule
 	 * @param index
+	 *            the {@link ModifiableOntologyIndex} from which to remove the
+	 *            rule
 	 * @return {@code true} if the operation is successful and {@code false} if
 	 *         not; if {@code false} is return, the index remains unchanged
 	 */

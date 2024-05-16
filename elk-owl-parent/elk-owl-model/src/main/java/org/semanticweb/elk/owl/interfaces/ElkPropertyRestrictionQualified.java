@@ -49,6 +49,8 @@ public interface ElkPropertyRestrictionQualified<P, F>
 	 * 
 	 * @param visitor
 	 *            the visitor that can work with this object type
+	 * @param <O>
+	 *            the type of the output of the visitor
 	 * @return the output of the visitor
 	 */
 	public <O> O accept(ElkPropertyRestrictionQualifiedVisitor<O> visitor);

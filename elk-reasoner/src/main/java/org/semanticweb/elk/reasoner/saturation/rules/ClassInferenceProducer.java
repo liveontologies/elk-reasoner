@@ -33,9 +33,10 @@ import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 public interface ClassInferenceProducer {
 
 	/**
-	 * Reports a new {@link ClassInference}.
+	 * Produces a new {@link ClassInference}.
 	 * 
 	 * @param inference
+	 *            the {@link ClassInference} to be produced
 	 */
 	public void produce(ClassInference inference);
 
