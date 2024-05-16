@@ -518,6 +518,7 @@ public class ElkTimer {
 	 * name.
 	 * 
 	 * @param timerName
+	 *            the name of the timer
 	 * @return timer
 	 */
 	public static ElkTimer getNamedTotalTimer(String timerName) {

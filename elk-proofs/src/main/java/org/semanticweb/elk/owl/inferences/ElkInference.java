@@ -42,8 +42,8 @@ public interface ElkInference extends Inference<ElkAxiom> {
 	 *            the factory for creating the premises
 	 * @return the premise at the specified position in this inference.
 	 * @throws IndexOutOfBoundsException
-	 *             if the position is out of range (
-	 *             <tt>index &lt; 0 || index &gt;= size()</tt>)
+	 *             if the position is out of range
+	 *             {@code (index <= 0 || index >= size())}
 	 */
 	ElkAxiom getPremise(int index, ElkObject.Factory factory);
 

@@ -45,7 +45,7 @@ public interface Multimap<Key, Value> {
 	 *            the key of the pair
 	 * @param value
 	 *            the value of the pair
-	 * @return <tt>true</tt> if this multimap contains the pair, <tt>false</tt>
+	 * @return {@code true} if this multimap contains the pair, {@code false}
 	 *         otherwise
 	 */
 	boolean contains(Key key, Value value);
@@ -57,8 +57,8 @@ public interface Multimap<Key, Value> {
 	 *            the key of the pair
 	 * @param value
 	 *            the value of the pair
-	 * @return <tt>true</tt> if the multimap has changed as a result of the
-	 *         operation, <tt>fase</tt> otherwise
+	 * @return {@code true} if the multimap has changed as a result of the
+	 *         operation, {@code false} otherwise
 	 */
 	boolean add(Key key, Value value);
 	
@@ -80,8 +80,8 @@ public interface Multimap<Key, Value> {
 	 *            the key of the pair
 	 * @param value
 	 *            the value of the pair
-	 * @return <tt>true</tt> if the multimap has changed as a result of the
-	 *         operation, <tt>false</tt> otherwise
+	 * @return {@code true} if the multimap has changed as a result of the
+	 *         operation, {@code false} otherwise
 	 */
 	boolean remove(Object key, Object value);
 	
@@ -97,7 +97,7 @@ public interface Multimap<Key, Value> {
 	/**
 	 * Checks if this multimap is empty
 	 * 
-	 * @return <tt>true</tt> if this multimap is empty, <tt>false</tt> otherwise
+	 * @return {@code true} if this multimap is empty, {@code false} otherwise
 	 */
 	boolean isEmpty();
 

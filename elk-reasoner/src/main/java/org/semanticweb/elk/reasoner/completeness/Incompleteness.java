@@ -130,6 +130,7 @@ public class Incompleteness {
 	 *         {@link IncompletenessMonitor} is obtained by composing the
 	 *         {@link IncompletenessMonitor}s of the input
 	 * @throws E
+	 *             if the operation was not successful
 	 */
 	public static <RA, RB, O, E extends Throwable> IncompleteResult<O> compose(
 			IncompleteResult<? extends RA> first,
@@ -151,7 +152,7 @@ public class Incompleteness {
 	 * @param <RB>
 	 *            the type of the second input result
 	 * @param <RC>
-	 *            the type of the third input result           
+	 *            the type of the third input result
 	 * @param <O>
 	 *            the type of the output result
 	 * @param <E>
@@ -161,7 +162,7 @@ public class Incompleteness {
 	 * @param second
 	 *            the second {@link IncompleteResult}
 	 * @param third
-	 *            the third {@link IncompleteResult}            
+	 *            the third {@link IncompleteResult}
 	 * @param fn
 	 *            the function used for composing the inputs of the
 	 *            {@link IncompleteResult}s
@@ -171,6 +172,7 @@ public class Incompleteness {
 	 *         {@link IncompletenessMonitor} is obtained by composing the
 	 *         {@link IncompletenessMonitor}s of the input
 	 * @throws E
+	 *             if the operation was not successful
 	 */
 	public static <RA, RB, RC, O, E extends Throwable> IncompleteResult<O> compose(
 			IncompleteResult<? extends RA> first,
