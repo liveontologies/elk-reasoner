@@ -126,6 +126,7 @@
 							<report>aggregate</report>
 						</reports>
 						<configuration>
+							<source>8</source>
 							<show>public</show>
 							<maxmemory>2g</maxmemory>
 							<minmemory>128m</minmemory>
