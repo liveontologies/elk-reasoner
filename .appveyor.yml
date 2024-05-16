@@ -4,6 +4,7 @@ environment:
   matrix:
     - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
       JAVA_HOME: /usr/lib/jvm/java-11-openjdk-amd64/
+      SITE: 1
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
       JAVA_HOME: C:\Program Files\Java\jdk1.8.0
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
@@ -22,7 +23,8 @@ install:
 build_script:
   - mvn install --settings .ci-settings.xml -DskipTests=true -U -B
 test_script:
-  - mvn test -Dassembly.skipAssembly=true -B
+  - mvn test -Dassembly.skipAssembly=true -B 
+  - bash -c "if [ ${SITE} ]; then mvn site -B; fi"
 deploy_script:
   - bash -c "if [ ${DEPLOY} ] && [ ${APPVEYOR_REPO_BRANCH} = 'main' ]; then mvn deploy --settings .ci-settings.xml -DskipTests=true -B; fi"   
 cache:
