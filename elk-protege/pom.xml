@@ -141,7 +141,7 @@
 			<optional>true</optional>
 		</dependency>
 		<dependency>
-			<groupId>org.liveontologies</groupId>
+			<groupId>io.github.liveontologies</groupId>
 			<artifactId>protege-proof-justification</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 			<optional>true</optional>
