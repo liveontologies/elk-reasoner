@@ -326,7 +326,7 @@
 						<Implementation-Title>${project.parent.name}</Implementation-Title>
 						<Implementation-Vendor>${project.organization.name}</Implementation-Vendor>
 						<Implementation-Version>${project.version}.${maven.build.timestamp}</Implementation-Version>
-						<Bundle-SymbolicName>${project.groupId};singleton:=true</Bundle-SymbolicName>
+						<Bundle-SymbolicName>${project.groupId}.${project.artifactId};singleton:=true</Bundle-SymbolicName>
 						<Export-Package>!*</Export-Package>
 						<Embed-Dependency>*;scope=provided;inline=true</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
