@@ -22,12 +22,12 @@
     <class value="org.semanticweb.elk.protege.ui.ElkProofPreferencesPanel"/>
 </extension>
 
-<extension id="elk.prover" point="org.liveontologies.protege.justification.proof.JustificationProofService">
+<extension id="elk.prover" point="io.github.liveontologies.protege.justification.proof.JustificationProofService">
    <name value="ELK OWL Proof Service"/>
    <class value="org.semanticweb.elk.protege.proof.ElkOwlJustificationProofService"/>
 </extension>
 
-<extension id="elk.prover" point="org.liveontologies.protege.justification.proof.JustificationProofService">
+<extension id="elk.prover" point="io.github.liveontologies.protege.justification.proof.JustificationProofService">
    <name value="ELK Internal Proof Service"/>
    <class value="org.semanticweb.elk.protege.proof.ElkInternalJustificationProofService"/>
 </extension>

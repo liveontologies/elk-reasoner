@@ -4,7 +4,7 @@
 
 	<parent>
 		<artifactId>elk-parent</artifactId>
-		<groupId>com.github.liveontologies</groupId>
+		<groupId>io.github.liveontologies</groupId>
 		<version>0.6.0-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>

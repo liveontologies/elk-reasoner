@@ -21,12 +21,13 @@
  */
 package org.semanticweb.elk.protege.proof;
 
-import org.liveontologies.protege.justification.proof.service.JustificationProofService;
 import org.liveontologies.puli.Inference;
 import org.protege.editor.owl.OWLEditorKit;
 import org.semanticweb.elk.owlapi.ElkReasoner;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
+
+import io.github.liveontologies.protege.justification.proof.service.JustificationProofService;
 
 public abstract class ElkJustificationProofService
 		extends JustificationProofService<Inference<?>> {
