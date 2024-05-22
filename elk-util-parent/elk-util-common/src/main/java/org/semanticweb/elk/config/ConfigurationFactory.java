@@ -211,7 +211,7 @@ public class ConfigurationFactory {
 		} catch (Throwable e) {
 			throw new ConfigurationException(
 					"Failed to instantiate the configuration class "
-							+ configClass);
+							+ configClass, e);
 		}
 	}
 
