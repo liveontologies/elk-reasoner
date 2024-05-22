@@ -52,7 +52,7 @@ public interface IndexedEntailmentQuery<E extends Entailment> {
 
 	/**
 	 * Explains why the queried entailment is entailed. If it is not entailed,
-	 * it is not provable by the inferences from the returned proof.
+	 * the resulting proof is empty.
 	 * 
 	 * @param atMostOne
 	 *            {@code true} to return at most one explanation and

@@ -33,7 +33,6 @@ import org.semanticweb.elk.reasoner.entailments.model.EntailmentInference;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
-import org.semanticweb.elk.reasoner.saturation.context.Context;
 
 /**
  * An {@link IndexedEntailmentQuery} that first checks entailment of its
@@ -88,6 +87,7 @@ public abstract class AbstractEntailmentQueryWithPremises<E extends Entailment, 
 		return result;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Proof<EntailmentInference> getEvidence(final boolean atMostOne,
 			final SaturationState<?> saturationState,
@@ -97,8 +97,12 @@ public abstract class AbstractEntailmentQueryWithPremises<E extends Entailment, 
 		final Collection<Proof<EntailmentInference>> proofs = new ArrayList<Proof<EntailmentInference>>();
 
 		for (final P premise : premises_) {
-			proofs.add(premise.getEvidence(atMostOne, saturationState,
-					conclusionFactory));
+			Proof<EntailmentInference> premiseProof = premise
+					.getEvidence(atMostOne, saturationState, conclusionFactory);
+			if (premiseProof.getInferences(premise.getQuery()).isEmpty()) {
+				return Proofs.EMPTY_PROOF;
+			}
+			proofs.add(premiseProof);
 		}
 
 		proofs.add(new Proof<EntailmentInference>() {

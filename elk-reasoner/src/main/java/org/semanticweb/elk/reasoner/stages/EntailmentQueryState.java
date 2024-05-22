@@ -173,7 +173,8 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 			}
 			// else
 			// TODO: cache result?
-			return Proofs.isDerivable(getEvidence(true), indexed.getQuery());
+			return !getEvidence(true).getInferences(indexed.getQuery())
+					.isEmpty();
 		}
 
 		@Override
