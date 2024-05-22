@@ -159,9 +159,7 @@ public class ClassTaxonomyState {
 	
 	private void toRemove(IndexedClass cls) {
 		LOGGER_.trace("To remove: {}", cls);
-		if (toRemove_.get(cls) == null) {
-			toRemove_.put(cls, cls);
-		}
+		toRemove_.putIfAbsent(cls, cls);
 	}
 	
 	public <C extends Context> ClassTaxonomyState(
