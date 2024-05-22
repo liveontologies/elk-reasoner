@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
-import org.liveontologies.puli.Producer;
 import org.semanticweb.elk.owl.interfaces.ElkAsymmetricObjectPropertyAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkClassAssertionAxiom;
@@ -92,6 +91,7 @@ import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectProper
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableOntologyIndex;
 import org.semanticweb.elk.reasoner.indexing.model.OccurrenceIncrement;
+import org.semanticweb.elk.reasoner.proof.ReasonerProducer;
 
 /**
  * An implementation of {@link ElkAxiomConverter} that converts {@link ElkAxiom}
@@ -280,7 +280,7 @@ public class ElkAxiomConverterImpl extends NoOpElkAnnotationAxiomConverter<Void>
 	 *            indicates whether the converted axioms must be inserted {@code (> 0)}
 	 *            or deleted {@code (< 0)} and with which multiplicity          
 	 * @param producer
-	 *            a {@link Producer} used to record the conversion inferences
+	 *            a {@link ReasonerProducer} used to record the conversion inferences
 	 */
 	public ElkAxiomConverterImpl(PredefinedElkClassFactory elkFactory,
 			ModifiableIndexedObject.Factory neutralFactory,
@@ -289,7 +289,7 @@ public class ElkAxiomConverterImpl extends NoOpElkAnnotationAxiomConverter<Void>
 			ModifiableIndexedObject.Factory dualFactory,
 			OccurrenceListener occurrenceTracker,
 			int increment,
-			Producer<? super IndexedAxiomInference> producer) {
+			ReasonerProducer<? super IndexedAxiomInference> producer) {
 		this.elkFactory_ = elkFactory;
 		this.axiomInferenceFactory_ = new ModifiableIndexedAxiomInferenceConclusionVisitingFactory(
 				producer, neutralFactory);
@@ -328,12 +328,13 @@ public class ElkAxiomConverterImpl extends NoOpElkAnnotationAxiomConverter<Void>
 	 *            {@code (> 0)} or deleted {@code (< 0)} and with which
 	 *            multiplicity
 	 * @param producer
-	 *            a {@link Producer} used to record the conversion inferences
+	 *            a {@link ReasonerProducer} used to record the conversion
+	 *            inferences
 	 */
 	public ElkAxiomConverterImpl(PredefinedElkClassFactory elkFactory,
 			ModifiableIndexedObject.Factory factory,
 			final OccurrenceListener occurrenceTracker, int increment,
-			Producer<? super IndexedAxiomInference> producer) {
+			ReasonerProducer<? super IndexedAxiomInference> producer) {
 		this(elkFactory, factory, factory, factory, factory, occurrenceTracker, increment,
 				producer);
 	}
@@ -359,7 +360,7 @@ public class ElkAxiomConverterImpl extends NoOpElkAnnotationAxiomConverter<Void>
 	public ElkAxiomConverterImpl(PredefinedElkClassFactory elkFactory,
 			ModifiableOntologyIndex index) {
 		this(elkFactory, new ResolvingModifiableIndexedObjectFactory(index),
-				index, 0, Producer.Dummy.get());
+				index, 0, ReasonerProducer.dummy());
 	}
 
 	/**
@@ -398,7 +399,7 @@ public class ElkAxiomConverterImpl extends NoOpElkAnnotationAxiomConverter<Void>
 						OccurrenceIncrement.getNegativeIncrement(increment)),
 				new UpdatingModifiableIndexedObjectFactory(index,
 						OccurrenceIncrement.getDualIncrement(increment)),
-				index, increment, Producer.Dummy.get());
+				index, increment, ReasonerProducer.dummy());
 	}
 
 	private <A extends ElkAxiom, M extends ElkObject> void indexDisjointMembers(

@@ -23,7 +23,7 @@ package org.semanticweb.elk.util.collections;
 
 import java.util.Iterator;
 
-import org.liveontologies.puli.statistics.HasStats;
+import org.semanticweb.elk.util.statistics.HasStats;
 
 import com.google.common.base.Predicate;
 

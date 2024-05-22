@@ -26,10 +26,10 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-import org.liveontologies.puli.Producer;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.proof.ReasonerProducer;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.stages.PropertyHierarchyCompositionState;
 import org.semanticweb.elk.util.collections.AbstractHashMultimap;
@@ -60,7 +60,7 @@ public class PropertyHierarchyCompositionComputationFactory extends
 	/**
 	 * used to record sub-property inferences
 	 */
-	private final Producer<? super ObjectPropertyInference> inferenceProducer_;
+	private final ReasonerProducer<? super ObjectPropertyInference> inferenceProducer_;
 
 	/**
 	 * The dispatcher of events over derived property hierarchy and
@@ -70,7 +70,7 @@ public class PropertyHierarchyCompositionComputationFactory extends
 	
 	public PropertyHierarchyCompositionComputationFactory(
 			final InterruptMonitor interrupter,
-			Producer<? super ObjectPropertyInference> inferenceProducer,
+			ReasonerProducer<? super ObjectPropertyInference> inferenceProducer,
 			final PropertyHierarchyCompositionState.Dispatcher dispatcher) {
 		super(interrupter);
 		this.inferenceProducer_ = inferenceProducer;

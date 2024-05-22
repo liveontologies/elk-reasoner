@@ -29,7 +29,6 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.liveontologies.puli.Producer;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
 import org.semanticweb.elk.owl.managers.ElkObjectEntityRecyclingFactory;
@@ -39,6 +38,7 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedPropertyChain;
+import org.semanticweb.elk.reasoner.proof.ReasonerProducer;
 import org.semanticweb.elk.reasoner.saturation.properties.VerifySymmetricPropertySaturation.AsymmetricCompositionHook;
 import org.semanticweb.elk.reasoner.stages.PropertyHierarchyCompositionState;
 import org.semanticweb.elk.util.concurrent.computation.ConcurrentExecutors;
@@ -186,7 +186,7 @@ public class IndexedPropertyChainSaturationTest {
 		PropertyHierarchyCompositionComputation computation = new PropertyHierarchyCompositionComputation(
 				Arrays.asList(H, S3, S2, S1, P3, P2, P1, R, RR),
 				new PropertyHierarchyCompositionComputationFactory(
-						DummyInterruptMonitor.INSTANCE, Producer.Dummy.get(),
+						DummyInterruptMonitor.INSTANCE, ReasonerProducer.dummy(),
 						PropertyHierarchyCompositionState.Dispatcher.DUMMY),
 				ConcurrentExecutors.create("test-hierarchy-compositions"),
 				maxThreads, new DummyProgressMonitor());

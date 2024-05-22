@@ -6,7 +6,7 @@ package org.semanticweb.elk.reasoner.query;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2020 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2024 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,9 @@ package org.semanticweb.elk.reasoner.query;
  * #L%
  */
 
-import org.liveontologies.puli.Proof;
 import org.semanticweb.elk.reasoner.entailments.model.Entailment;
 import org.semanticweb.elk.reasoner.entailments.model.EntailmentInference;
+import org.semanticweb.elk.reasoner.proof.ReasonerProof;
 
 /**
  * A {@link QueryResult} which can be verified using a proof.
@@ -46,7 +46,7 @@ public interface VerifiableQueryResult extends QueryResult {
 	 *             TODO: change to a direct proof of the query, e.g., using
 	 *             InternalProof
 	 */
-	Proof<EntailmentInference> getEvidence(boolean atMostOne)
+	ReasonerProof<EntailmentInference> getEvidence(boolean atMostOne)
 			throws ElkQueryException;
 
 	/**

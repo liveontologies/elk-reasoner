@@ -25,7 +25,6 @@ import java.util.Collection;
 
 import org.liveontologies.puli.BaseProof;
 import org.liveontologies.puli.DynamicProof;
-import org.liveontologies.puli.Proof;
 import org.liveontologies.puli.Proofs;
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.exceptions.ElkRuntimeException;
@@ -38,6 +37,7 @@ import org.semanticweb.elk.owlapi.ElkConverter;
 import org.semanticweb.elk.owlapi.ElkReasoner;
 import org.semanticweb.elk.owlapi.wrapper.OwlConverter;
 import org.semanticweb.elk.reasoner.entailments.model.EntailmentInference;
+import org.semanticweb.elk.reasoner.proof.ReasonerProof;
 import org.semanticweb.elk.reasoner.query.VerifiableQueryResult;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.reasoner.UnsupportedEntailmentTypeException;
@@ -106,7 +106,7 @@ public class ElkOwlProof extends BaseProof<ElkOwlInference>
 						ElkOwlProof.this);
 				final ElkInference.Factory factory = new ElkInferenceOptimizedProducingFactory(
 						producer);
-				final Proof<EntailmentInference> evidence = result
+				final ReasonerProof<EntailmentInference> evidence = result
 						.getEvidence(false);
 				new ElkProofGenerator(evidence,
 						elkReasoner_.getInternalReasoner(), factory)

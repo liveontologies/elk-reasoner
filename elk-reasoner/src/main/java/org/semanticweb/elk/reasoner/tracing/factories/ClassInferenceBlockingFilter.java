@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
-import org.liveontologies.puli.Producer;
+import org.semanticweb.elk.reasoner.proof.ReasonerProducer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.inferences.ClassInference;
 import org.semanticweb.elk.reasoner.tracing.ConclusionBaseFactory;
@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Yevgeny Kazakov
  */
-class ClassInferenceBlockingFilter implements Producer<ClassInference> {
+class ClassInferenceBlockingFilter implements ReasonerProducer<ClassInference> {
 
 	private static final Logger LOGGER_ = LoggerFactory
 			.getLogger(ClassInferenceBlockingFilter.class);

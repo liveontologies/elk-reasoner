@@ -29,8 +29,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.liveontologies.puli.Proof;
-import org.liveontologies.puli.Proofs;
 import org.semanticweb.elk.loading.AbstractEntailmentQueryLoader;
 import org.semanticweb.elk.loading.ElkLoadingException;
 import org.semanticweb.elk.loading.EntailmentQueryLoader;
@@ -48,6 +46,7 @@ import org.semanticweb.elk.reasoner.entailments.InconsistencyProofWrapper;
 import org.semanticweb.elk.reasoner.entailments.model.Entailment;
 import org.semanticweb.elk.reasoner.entailments.model.EntailmentInference;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.proof.ReasonerProof;
 import org.semanticweb.elk.reasoner.query.ElkQueryException;
 import org.semanticweb.elk.reasoner.query.IndexedEntailmentQuery;
 import org.semanticweb.elk.reasoner.query.VerifiableQueryResult;
@@ -182,17 +181,16 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 			return queryIncompletenessMonitor_;
 		}
 
-		@SuppressWarnings("unchecked")
 		@Override
-		public Proof<EntailmentInference> getEvidence(final boolean onlyOne)
+		public ReasonerProof<EntailmentInference> getEvidence(final boolean onlyOne)
 				throws ElkQueryException {
 			if (indexed == null) {
 				// not indexed => no proof
-				return Proofs.EMPTY_PROOF;
+				return ReasonerProof.empty();
 			}
 			// else
 
-			final Proof<EntailmentInference> inconsistencyEvidence = new InconsistencyProofWrapper(
+			final ReasonerProof<EntailmentInference> inconsistencyEvidence = new InconsistencyProofWrapper(
 					consistencyCheckingState_.getEvidence(onlyOne));
 
 			if (consistencyCheckingState_.isInconsistent() && onlyOne) {
@@ -200,10 +198,10 @@ public class EntailmentQueryState implements EntailmentQueryLoader.Factory {
 			}
 			// else
 
-			final Proof<EntailmentInference> entailmentEvidence = indexed
+			final ReasonerProof<EntailmentInference> entailmentEvidence = indexed
 					.getEvidence(onlyOne, saturationState_, conclusionFactory_);
 
-			return Proofs.union(inconsistencyEvidence, entailmentEvidence);
+			return ReasonerProof.union(inconsistencyEvidence, entailmentEvidence);
 		}
 
 		public synchronized boolean lock() {

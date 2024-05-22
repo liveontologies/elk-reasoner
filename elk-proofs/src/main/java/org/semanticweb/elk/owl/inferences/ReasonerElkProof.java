@@ -23,12 +23,12 @@ package org.semanticweb.elk.owl.inferences;
 
 import org.liveontologies.puli.ChronologicalProof;
 import org.liveontologies.puli.DynamicProof;
-import org.liveontologies.puli.Proof;
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.entailments.model.EntailmentInference;
+import org.semanticweb.elk.reasoner.proof.ReasonerProof;
 import org.semanticweb.elk.reasoner.query.VerifiableQueryResult;
 
 /**
@@ -67,9 +67,10 @@ public class ReasonerElkProof extends ChronologicalProof<ElkInference>
 
 		final VerifiableQueryResult result = reasoner_.checkEntailment(goal);
 		try {
-			final Proof<EntailmentInference> evidence = result.getEvidence(false);
-			new ElkProofGenerator(evidence, reasoner_,
-					inferenceFactory_).generate(result.getEntailment());
+			ReasonerProof<EntailmentInference> evidence = result
+					.getEvidence(false);
+			new ElkProofGenerator(evidence, reasoner_, inferenceFactory_)
+					.generate(result.getEntailment());
 		} finally {
 			result.unlock();
 		}

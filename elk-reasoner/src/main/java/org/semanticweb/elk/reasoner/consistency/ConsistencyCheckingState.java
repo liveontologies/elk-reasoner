@@ -29,7 +29,6 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.liveontologies.puli.Proof;
 import org.semanticweb.elk.reasoner.entailments.impl.IndividualInconsistencyEntailsOntologyInconsistencyImpl;
 import org.semanticweb.elk.reasoner.entailments.impl.OntologyInconsistencyImpl;
 import org.semanticweb.elk.reasoner.entailments.impl.OwlThingInconsistencyEntailsOntologyInconsistencyImpl;
@@ -44,6 +43,7 @@ import org.semanticweb.elk.reasoner.indexing.model.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
+import org.semanticweb.elk.reasoner.proof.ReasonerProof;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.SaturationStateDummyChangeListener;
 import org.semanticweb.elk.reasoner.saturation.conclusions.classes.SaturationConclusionBaseFactory;
@@ -314,10 +314,10 @@ public class ConsistencyCheckingState {
 	 *            Whether at most one explanation should be returned.
 	 * @return An evidence of entailment of ontology inconsistency.
 	 */
-	public Proof<? extends EntailmentInference> getEvidence(
+	public ReasonerProof<? extends EntailmentInference> getEvidence(
 			final boolean atMostOne) {
 
-		return new Proof<EntailmentInference>() {
+		return new ReasonerProof<EntailmentInference>() {
 
 			@Override
 			public Collection<OntologyInconsistencyEntailmentInference> getInferences(

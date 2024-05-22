@@ -26,11 +26,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.liveontologies.puli.Proof;
-import org.liveontologies.puli.Proofs;
 import org.semanticweb.elk.reasoner.entailments.model.Entailment;
 import org.semanticweb.elk.reasoner.entailments.model.EntailmentInference;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.proof.ReasonerProof;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
 
@@ -39,7 +38,7 @@ import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConcl
  * premises.
  * <p>
  * {@link #getEvidence(boolean, SaturationState, SaturationConclusion.Factory)}
- * combines {@link Proof}s over {@link EntailmentInference}s of the premises and
+ * combines {@link ReasonerProof}s over {@link EntailmentInference}s of the premises and
  * adds {@link EntailmentInference} returned by
  * {@link #getEntailmentInference()}.
  * 
@@ -87,25 +86,24 @@ public abstract class AbstractEntailmentQueryWithPremises<E extends Entailment, 
 		return result;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public Proof<EntailmentInference> getEvidence(final boolean atMostOne,
-			final SaturationState<?> saturationState,
+	public ReasonerProof<EntailmentInference> getEvidence(
+			final boolean atMostOne, final SaturationState<?> saturationState,
 			final SaturationConclusion.Factory conclusionFactory)
 			throws ElkQueryException {
 
-		final Collection<Proof<EntailmentInference>> proofs = new ArrayList<Proof<EntailmentInference>>();
+		final Collection<ReasonerProof<EntailmentInference>> proofs = new ArrayList<>();
 
 		for (final P premise : premises_) {
-			Proof<EntailmentInference> premiseProof = premise
+			ReasonerProof<EntailmentInference> premiseProof = premise
 					.getEvidence(atMostOne, saturationState, conclusionFactory);
 			if (premiseProof.getInferences(premise.getQuery()).isEmpty()) {
-				return Proofs.EMPTY_PROOF;
+				return ReasonerProof.empty();
 			}
 			proofs.add(premiseProof);
 		}
 
-		proofs.add(new Proof<EntailmentInference>() {
+		proofs.add(new ReasonerProof<EntailmentInference>() {
 
 			@Override
 			public Collection<? extends EntailmentInference> getInferences(
@@ -120,8 +118,7 @@ public abstract class AbstractEntailmentQueryWithPremises<E extends Entailment, 
 			}
 
 		});
-
-		return Proofs.union(proofs);
+		return ReasonerProof.union(proofs);
 	}
 
 	/**

@@ -26,13 +26,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.liveontologies.puli.Proof;
 import org.semanticweb.elk.reasoner.entailments.impl.DerivedClassInclusionEntailsSubClassOfAxiomImpl;
 import org.semanticweb.elk.reasoner.entailments.impl.SubClassInconsistencyEntailsSubClassOfAxiomImpl;
 import org.semanticweb.elk.reasoner.entailments.model.EntailmentInference;
 import org.semanticweb.elk.reasoner.entailments.model.SubClassOfAxiomEntailment;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.proof.ReasonerProof;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SaturationConclusion;
@@ -80,11 +80,11 @@ public class SubClassOfEntailmentQuery
 	}
 
 	@Override
-	public Proof<EntailmentInference> getEvidence(
+	public ReasonerProof<EntailmentInference> getEvidence(
 			final boolean atMostOne, final SaturationState<?> saturationState,
 			final SaturationConclusion.Factory conclusionFactory)
 			throws ElkQueryException {
-		return new Proof<EntailmentInference>() {
+		return new ReasonerProof<EntailmentInference>() {
 
 			@Override
 			public Collection<? extends EntailmentInference> getInferences(

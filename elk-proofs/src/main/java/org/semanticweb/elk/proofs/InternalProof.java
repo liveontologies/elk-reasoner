@@ -40,6 +40,7 @@ import org.semanticweb.elk.reasoner.Reasoner;
 import org.semanticweb.elk.reasoner.entailments.model.Entailment;
 import org.semanticweb.elk.reasoner.entailments.model.EntailmentInference;
 import org.semanticweb.elk.reasoner.entailments.model.HasReason;
+import org.semanticweb.elk.reasoner.proof.ReasonerProof;
 import org.semanticweb.elk.reasoner.query.VerifiableQueryResult;
 import org.semanticweb.elk.reasoner.tracing.Conclusion;
 import org.semanticweb.elk.reasoner.tracing.TracingInference;
@@ -81,7 +82,7 @@ public class InternalProof implements Proof<Inference<Object>> {
 	}
 
 	private void processEntailment(final Entailment goal,
-			final Proof<EntailmentInference> evidence) throws ElkException {
+			final ReasonerProof<EntailmentInference> evidence) throws ElkException {
 
 		final Set<Entailment> entailmentDone = new ArrayHashSet<Entailment>();
 		final Queue<Entailment> entailmentToDo = new LinkedList<Entailment>();
@@ -123,7 +124,7 @@ public class InternalProof implements Proof<Inference<Object>> {
 			}
 		}
 
-		final Proof<TracingInference> tracingProof = reasoner_.getProof();
+		final ReasonerProof<TracingInference> tracingProof = reasoner_.getProof();
 
 		Conclusion conclusion;
 		while ((conclusion = tracingToDo.poll()) != null) {

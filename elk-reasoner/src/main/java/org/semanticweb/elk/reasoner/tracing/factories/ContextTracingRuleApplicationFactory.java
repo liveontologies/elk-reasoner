@@ -21,10 +21,10 @@
  */
 package org.semanticweb.elk.reasoner.tracing.factories;
 
-import org.liveontologies.puli.Producer;
 import org.semanticweb.elk.Reference;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
+import org.semanticweb.elk.reasoner.proof.ReasonerProducer;
 import org.semanticweb.elk.reasoner.saturation.ExtendedContext;
 import org.semanticweb.elk.reasoner.saturation.MainContextFactory;
 import org.semanticweb.elk.reasoner.saturation.MapSaturationState;
@@ -56,7 +56,8 @@ import org.semanticweb.elk.util.concurrent.computation.InterruptMonitor;
  * {@link ClassConclusion}s currently stored in the {@link Context}s of the main
  * {@link SaturationState}. This {@link SaturationState} is not modified. The
  * inferences producing the {@link ClassConclusion}s in this
- * {@link SaturationState} are produced using the supplied {@link Producer}.
+ * {@link SaturationState} are produced using the supplied
+ * {@link ReasonerProducer}.
  * 
  * @author Pavel Klinov
  * 
@@ -69,12 +70,12 @@ public class ContextTracingRuleApplicationFactory extends
 
 	private final SaturationState<?> mainSaturationState_;
 
-	private final Producer<ClassInference> inferenceProducer_;
+	private final ReasonerProducer<ClassInference> inferenceProducer_;
 
 	public ContextTracingRuleApplicationFactory(
 			final InterruptMonitor interrupter,
 			SaturationState<?> mainSaturationState,
-			Producer<ClassInference> inferenceProducer) {
+			ReasonerProducer<ClassInference> inferenceProducer) {
 		super(interrupter,
 				new MapSaturationState<ExtendedContext>(
 						mainSaturationState.getOntologyIndex(),

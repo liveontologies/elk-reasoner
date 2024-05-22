@@ -23,7 +23,7 @@ package org.semanticweb.elk.util.collections;
 
 import java.util.Map;
 
-import org.liveontologies.puli.statistics.Stat;
+import org.semanticweb.elk.util.statistics.Stat;
 
 /**
  * An {@link RecencyEvictor} that balances its capacity so that some proportion

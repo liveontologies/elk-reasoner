@@ -27,7 +27,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import org.liveontologies.puli.statistics.Stat;
+import org.semanticweb.elk.util.statistics.Stat;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;

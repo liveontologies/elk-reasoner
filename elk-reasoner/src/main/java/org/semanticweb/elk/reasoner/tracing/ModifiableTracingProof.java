@@ -23,10 +23,10 @@ package org.semanticweb.elk.reasoner.tracing;
 
 import java.util.Set;
 
-import org.liveontologies.puli.ModifiableProof;
+import org.semanticweb.elk.reasoner.proof.ModifiableReasonerProof;
 
 public interface ModifiableTracingProof<I extends TracingInference>
-		extends GenericTracingProof<I>, ModifiableProof<I> {
+		extends GenericTracingProof<I>, ModifiableReasonerProof<I> {
 
 	Set<? extends Conclusion> getAllConclusions();
 

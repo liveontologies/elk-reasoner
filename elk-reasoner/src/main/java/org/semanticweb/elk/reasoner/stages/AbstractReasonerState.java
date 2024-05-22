@@ -28,7 +28,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-import org.liveontologies.puli.statistics.NestedStats;
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.loading.AxiomLoader;
@@ -91,6 +90,7 @@ import org.semanticweb.elk.reasoner.tracing.TracingInference;
 import org.semanticweb.elk.reasoner.tracing.TracingProof;
 import org.semanticweb.elk.util.collections.ArrayHashSet;
 import org.semanticweb.elk.util.concurrent.computation.ConcurrentExecutor;
+import org.semanticweb.elk.util.statistics.NestedStats;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

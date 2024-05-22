@@ -24,14 +24,14 @@ package org.semanticweb.elk.reasoner.entailments;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.liveontologies.puli.Inference;
-import org.liveontologies.puli.Proof;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.entailments.impl.OntologyInconsistencyEntailsAnyAxiomImpl;
 import org.semanticweb.elk.reasoner.entailments.impl.OntologyInconsistencyImpl;
 import org.semanticweb.elk.reasoner.entailments.model.AxiomEntailment;
 import org.semanticweb.elk.reasoner.entailments.model.Entailment;
 import org.semanticweb.elk.reasoner.entailments.model.EntailmentInference;
+import org.semanticweb.elk.reasoner.proof.ReasonerInference;
+import org.semanticweb.elk.reasoner.proof.ReasonerProof;
 
 /**
  * This class is intended to be a wrapper of the proof returned by
@@ -47,19 +47,19 @@ import org.semanticweb.elk.reasoner.entailments.model.EntailmentInference;
  * 
  * @author Peter Skocovsky
  */
-public class InconsistencyProofWrapper implements Proof<EntailmentInference> {
+public class InconsistencyProofWrapper implements ReasonerProof<EntailmentInference> {
 
-	private final Proof<? extends EntailmentInference> inconsistencyEvidence_;
+	private final ReasonerProof<? extends EntailmentInference> inconsistencyEvidence_;
 
 	public InconsistencyProofWrapper(
-			final Proof<? extends EntailmentInference> inconsistencyEvidence) {
+			final ReasonerProof<? extends EntailmentInference> inconsistencyEvidence) {
 		this.inconsistencyEvidence_ = inconsistencyEvidence;
 	}
 
 	@Override
 	public Collection<? extends EntailmentInference> getInferences(
 			final Object conclusion) {
-		final Collection<? extends Inference<Entailment>> infs = inconsistencyEvidence_
+		final Collection<? extends ReasonerInference<Entailment>> infs = inconsistencyEvidence_
 				.getInferences(OntologyInconsistencyImpl.INSTANCE);
 		if (infs == null || infs.isEmpty()) {
 			/*

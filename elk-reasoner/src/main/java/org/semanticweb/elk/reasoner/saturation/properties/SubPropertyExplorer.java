@@ -26,11 +26,11 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
-import org.liveontologies.puli.Producer;
 import org.semanticweb.elk.owl.interfaces.ElkAxiom;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedComplexPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
+import org.semanticweb.elk.reasoner.proof.ReasonerProducer;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChain;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.SubPropertyChainExpandedSubObjectPropertyOf;
@@ -79,7 +79,7 @@ class SubPropertyExplorer {
 	/**
 	 * used to record {@link SubPropertyChainInference}
 	 */
-	private final Producer<? super SubPropertyChainInference> inferenceProducer_;
+	private final ReasonerProducer<? super SubPropertyChainInference> inferenceProducer_;
 
 	private final SubPropertyChainInference.Visitor<Void> inferenceProcessor_ = new SubPropertyChainInferenceConclusionVisitor<Void>(
 			new SubPropertyChain.Visitor<Void>() {
@@ -95,7 +95,7 @@ class SubPropertyExplorer {
 	SubPropertyExplorer(IndexedPropertyChain input,
 			Set<IndexedPropertyChain> subPropertyChains,
 			Set<IndexedObjectProperty> subProperties,
-			Producer<? super SubPropertyChainInference> inferenceProducer) {
+			ReasonerProducer<? super SubPropertyChainInference> inferenceProducer) {
 		this.input_ = input;
 		this.subPropertyChains_ = subPropertyChains;
 		this.subProperties_ = subProperties;
@@ -140,7 +140,7 @@ class SubPropertyExplorer {
 	private static void expandUnderSubProperties(IndexedPropertyChain input,
 			Set<IndexedPropertyChain> currentSubPropertyChains,
 			Set<IndexedObjectProperty> currentSubProperties,
-			Producer<? super SubPropertyChainInference> inferenceProducer) {
+			ReasonerProducer<? super SubPropertyChainInference> inferenceProducer) {
 		new SubPropertyExplorer(input, currentSubPropertyChains,
 				currentSubProperties, inferenceProducer).process();
 		if (LOGGER_.isTraceEnabled()) {
@@ -151,7 +151,7 @@ class SubPropertyExplorer {
 
 	private static SaturatedPropertyChain computeSubProperties(
 			IndexedPropertyChain input,
-			Producer<? super SubPropertyChainInference> inferenceProducer,
+			ReasonerProducer<? super SubPropertyChainInference> inferenceProducer,
 			final PropertyHierarchyCompositionState.Dispatcher dispatcher) {
 		SaturatedPropertyChain saturation = input.getSaturated();
 		if (saturation.derivedSubPropertiesComputed)
@@ -195,7 +195,7 @@ class SubPropertyExplorer {
 	 */
 	static Set<IndexedPropertyChain> getSubPropertyChains(
 			IndexedPropertyChain input,
-			Producer<? super SubPropertyChainInference> inferenceProducer,
+			ReasonerProducer<? super SubPropertyChainInference> inferenceProducer,
 			final PropertyHierarchyCompositionState.Dispatcher dispatcher) {
 		return computeSubProperties(input, inferenceProducer, dispatcher)
 				.getSubPropertyChains();
@@ -219,7 +219,7 @@ class SubPropertyExplorer {
 	 */
 	static Set<IndexedObjectProperty> getSubProperties(
 			IndexedPropertyChain input,
-			Producer<? super SubPropertyChainInference> inferenceProducer,
+			ReasonerProducer<? super SubPropertyChainInference> inferenceProducer,
 			final PropertyHierarchyCompositionState.Dispatcher dispatcher) {
 		return computeSubProperties(input, inferenceProducer, dispatcher)
 				.getSubProperties();
@@ -244,7 +244,7 @@ class SubPropertyExplorer {
 	 */
 	static Multimap<IndexedObjectProperty, IndexedObjectProperty> getLeftSubComposableSubPropertiesByRightProperties(
 			IndexedObjectProperty input,
-			Producer<? super SubPropertyChainInference> inferenceProducer,
+			ReasonerProducer<? super SubPropertyChainInference> inferenceProducer,
 			final PropertyHierarchyCompositionState.Dispatcher dispatcher) {
 		SaturatedPropertyChain saturation = input.getSaturated();
 		if (saturation.leftSubComposableSubPropertiesByRightPropertiesComputed)

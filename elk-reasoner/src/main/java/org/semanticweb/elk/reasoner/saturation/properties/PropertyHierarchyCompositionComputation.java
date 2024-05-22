@@ -24,11 +24,11 @@ package org.semanticweb.elk.reasoner.saturation.properties;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.liveontologies.puli.Producer;
 import org.semanticweb.elk.reasoner.ProgressMonitor;
 import org.semanticweb.elk.reasoner.ReasonerComputationWithInputs;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedPropertyChain;
 import org.semanticweb.elk.reasoner.indexing.model.OntologyIndex;
+import org.semanticweb.elk.reasoner.proof.ReasonerProducer;
 import org.semanticweb.elk.reasoner.saturation.properties.inferences.ObjectPropertyInference;
 import org.semanticweb.elk.reasoner.stages.PropertyHierarchyCompositionState;
 import org.semanticweb.elk.util.concurrent.computation.ConcurrentExecutor;
@@ -46,7 +46,7 @@ public class PropertyHierarchyCompositionComputation extends
 
 	public PropertyHierarchyCompositionComputation(OntologyIndex ontIndex,
 			final InterruptMonitor interrupter,
-			Producer<? super ObjectPropertyInference> inferenceProducer,
+			ReasonerProducer<? super ObjectPropertyInference> inferenceProducer,
 			final PropertyHierarchyCompositionState.Dispatcher dispatcher,
 			ConcurrentExecutor executor, int maxWorkers,
 			ProgressMonitor progressMonitor) {

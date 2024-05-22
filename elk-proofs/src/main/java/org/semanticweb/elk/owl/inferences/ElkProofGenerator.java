@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.liveontologies.puli.Proof;
 import org.semanticweb.elk.exceptions.ElkException;
 import org.semanticweb.elk.exceptions.ElkRuntimeException;
 import org.semanticweb.elk.matching.Matcher;
@@ -67,13 +66,14 @@ import org.semanticweb.elk.reasoner.entailments.model.OwlThingInconsistencyEntai
 import org.semanticweb.elk.reasoner.entailments.model.SubClassInconsistencyEntailsSubClassOfAxiom;
 import org.semanticweb.elk.reasoner.entailments.model.SubClassOfAxiomEntailment;
 import org.semanticweb.elk.reasoner.entailments.model.TopObjectPropertyInBottomEntailsOntologyInconsistency;
+import org.semanticweb.elk.reasoner.proof.ReasonerProof;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassInconsistency;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassInclusionComposed;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubPropertyChain;
 
 public class ElkProofGenerator implements EntailmentInference.Visitor<Void> {
 
-	private final Proof<? extends EntailmentInference> evidence_;
+	private final ReasonerProof<? extends EntailmentInference> evidence_;
 
 	private final Reasoner reasoner_;
 
@@ -81,7 +81,7 @@ public class ElkProofGenerator implements EntailmentInference.Visitor<Void> {
 
 	private final ElkInference.Factory inferenceFactory_;
 
-	public ElkProofGenerator(final Proof<? extends EntailmentInference> evidence,
+	public ElkProofGenerator(final ReasonerProof<? extends EntailmentInference> evidence,
 			final Reasoner reasoner, final ElkObject.Factory elkFactory,
 			final ElkInference.Factory inferenceFactory) {
 		this.evidence_ = evidence;
@@ -90,7 +90,7 @@ public class ElkProofGenerator implements EntailmentInference.Visitor<Void> {
 		this.inferenceFactory_ = inferenceFactory;
 	}
 
-	public ElkProofGenerator(final Proof<? extends EntailmentInference> evidence,
+	public ElkProofGenerator(final ReasonerProof<? extends EntailmentInference> evidence,
 			final Reasoner reasoner,
 			final ElkInference.Factory inferenceFactory) {
 		this(evidence, reasoner, reasoner.getElkFactory(), inferenceFactory);

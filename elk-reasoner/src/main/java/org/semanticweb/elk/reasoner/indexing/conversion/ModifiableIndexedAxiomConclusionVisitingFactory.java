@@ -6,7 +6,7 @@ package org.semanticweb.elk.reasoner.indexing.conversion;
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2017 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2024 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,13 +22,13 @@ package org.semanticweb.elk.reasoner.indexing.conversion;
  * #L%
  */
 
-import org.liveontologies.puli.Producer;
 import org.semanticweb.elk.reasoner.indexing.classes.ModifiableIndexedAxiomInferenceBaseFactory;
 import org.semanticweb.elk.reasoner.indexing.classes.ModifiableIndexedAxiomInferenceConclusionVisitor;
 import org.semanticweb.elk.reasoner.indexing.classes.ModifiableIndexedAxiomInferenceDelegatingFactory;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedAxiomInference;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObject;
+import org.semanticweb.elk.reasoner.proof.ReasonerProducer;
 
 /**
  * A {@link ModifiableIndexedAxiomInference} that, in addition to creating
@@ -40,12 +40,12 @@ import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObject;
 class ModifiableIndexedAxiomInferenceConclusionVisitingFactory
 		extends ModifiableIndexedAxiomInferenceDelegatingFactory {
 
-	private final Producer<? super IndexedAxiomInference> inferenceProducer_;
+	private final ReasonerProducer<? super IndexedAxiomInference> inferenceProducer_;
 
 	private final ModifiableIndexedAxiomInference.Visitor<Void> inferenceVisitor_;
 
 	ModifiableIndexedAxiomInferenceConclusionVisitingFactory(
-			Producer<? super IndexedAxiomInference> inferenceProducer,
+			ReasonerProducer<? super IndexedAxiomInference> inferenceProducer,
 			ModifiableIndexedObject.Factory conclusionFactory) {
 		super(new ModifiableIndexedAxiomInferenceBaseFactory());
 		this.inferenceProducer_ = inferenceProducer;

@@ -26,8 +26,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
 
-import org.liveontologies.puli.Producer;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedContextRoot;
+import org.semanticweb.elk.reasoner.proof.ReasonerProducer;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationFactory;
 import org.semanticweb.elk.reasoner.saturation.ClassExpressionSaturationListener;
 import org.semanticweb.elk.reasoner.saturation.SaturationJob;
@@ -145,7 +145,7 @@ public class SingleContextTracingFactory
 	}
 
 	private class ThisClassInferenceProducer
-			implements Producer<ClassInference> {
+			implements ReasonerProducer<ClassInference> {
 
 		@Override
 		public void produce(final ClassInference inference) {

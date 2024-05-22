@@ -1,10 +1,12 @@
+package org.semanticweb.elk.util.statistics;
+
 /*-
  * #%L
- * ELK Reasoner Core
+ * ELK Utilities Collections
  * $Id:$
  * $HeadURL:$
  * %%
- * Copyright (C) 2011 - 2017 Department of Computer Science, University of Oxford
+ * Copyright (C) 2011 - 2024 Department of Computer Science, University of Oxford
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,20 +21,24 @@
  * limitations under the License.
  * #L%
  */
-package org.semanticweb.elk.reasoner.tracing;
 
-import org.semanticweb.elk.reasoner.proof.ReasonerProof;
+public class StatsException extends RuntimeException {
+	private static final long serialVersionUID = 3694803038220659642L;
 
-/**
- * An object which can be used to retrieve {@link TracingInference}s producing a
- * given {@link Conclusion}.
- * 
- * @author Peter Skocovsky
- *
- * @param <I>
- *            The type of the inferences.
- */
-public interface GenericTracingProof<I extends TracingInference>
-		extends ReasonerProof<I> {
-	// Restriction to tracing inferences.
+	public StatsException() {
+		super();
+	}
+
+	public StatsException(final String message, final Throwable cause) {
+		super(message, cause);
+	}
+
+	public StatsException(final String message) {
+		super(message);
+	}
+
+	public StatsException(final Throwable cause) {
+		super(cause);
+	}
+
 }
