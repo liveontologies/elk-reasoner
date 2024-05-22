@@ -21,6 +21,8 @@ package org.semanticweb.elk.testing;
  * #L%
  */
 
+import static org.junit.Assert.fail;
+
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.AppenderBase;
@@ -35,7 +37,7 @@ public class FailingAppender extends AppenderBase<ILoggingEvent> {
 
 	@Override
 	protected void append(ILoggingEvent event) {
-		throw new LoggingException(event.getFormattedMessage());
+		fail(event.getFormattedMessage());
 	}
 
 }
