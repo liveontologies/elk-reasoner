@@ -25,6 +25,7 @@ package org.semanticweb.elk.reasoner.saturation.conclusions.classes;
 import org.semanticweb.elk.Reference;
 import org.semanticweb.elk.reasoner.saturation.SaturationState;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.ClassConclusion;
+import org.semanticweb.elk.reasoner.saturation.conclusions.model.ContextInitialization;
 import org.semanticweb.elk.reasoner.saturation.conclusions.model.SubClassConclusion;
 import org.semanticweb.elk.reasoner.saturation.context.Context;
 import org.slf4j.Logger;
@@ -74,12 +75,18 @@ public class ClassConclusionTracingContextNotSaturatedCheckingVisitor
 	@Override
 	protected Boolean defaultVisit(ClassConclusion conclusion) {
 		Context originContext = state_.getContext(conclusion.getTraceRoot());
-		if (originContext.isInitialized() && originContext.isSaturated()) {
+		if (originContext.isInitialized() && originContext.isSaturated()
+				&& !(conclusion instanceof ContextInitialization)) { // (*)
 			LOGGER_.error("{}: adding conclusion {} to saturated context {}",
 					contextRef_, conclusion,
 					get().containsConclusion(conclusion)
 							? "(it is already there)"
 							: "");
+			// (*): Since saturated contexts are not set straight away, it is
+			// possible that after a saturation job for a context
+			// is processed but not yet marked as saturated, another job for the
+			// same context is submitted and the insertion attempt happens 
+			// after the context for the first job is marked as saturated
 		}
 		return true;
 	}
