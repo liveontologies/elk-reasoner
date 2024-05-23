@@ -99,6 +99,8 @@ public enum Feature {
 	//
 	OBJECT_HAS_SELF_NEGATIVE("ObjectHasSelf", Polarity.NEGATIVE),
 	//
+	OBJECT_HAS_VALUE_POSITIVE("ObjectHasValue", Polarity.POSITIVE),
+	//
 	OBJECT_INVERSE_OF("ObjectInverseOf"),
 	//
 	OBJECT_MAX_CARDINALITY("ObjectMaxCardinality"),

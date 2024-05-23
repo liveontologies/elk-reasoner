@@ -52,8 +52,7 @@ public class OwlInternalProofTest {
 
 	// @formatter:off
 	static final String[] IGNORE_LIST = {
-			ElkTestUtils.TEST_INPUT_LOCATION + "/query/entailment/AssertionRanges.owl", // Ranges not supported with assertions
-			ElkTestUtils.TEST_INPUT_LOCATION + "/query/entailment/HasValueRanges.owl",// Ranges not supported with ObjectHasValue
+			ElkTestUtils.TEST_INPUT_LOCATION + "/query/entailment/AssertionRanges.owl", // Ranges not supported with assertions			
 	};
 	static final String[] IGNORE_COMPLETENESS_LIST = {
 			ElkTestUtils.TEST_INPUT_LOCATION + "/query/entailment/EmptyOntology.owl",// All entailments are tautologies.

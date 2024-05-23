@@ -36,7 +36,10 @@ public class TopIncompletenessMonitor extends SomeOfIncompletenessMonitor {
 	private static final Feature[][] UNSUPPORTED_COMBINATIONS_OF_FEATURES_ = {
 			{ Feature.OBJECT_PROPERTY_RANGE,
 					//
-					Feature.OBJECT_PROPERTY_ASSERTION } };
+					Feature.OBJECT_PROPERTY_ASSERTION },
+			{ Feature.OBJECT_PROPERTY_RANGE,
+					//
+					Feature.OBJECT_HAS_VALUE_POSITIVE } };
 
 	private static final Feature[] UNSUPPORTED_FEATURES_ = {
 			Feature.ANONYMOUS_INDIVIDUAL,

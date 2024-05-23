@@ -50,9 +50,7 @@ public class ElkEntailmentQueryTest extends
 		BaseQueryTest<Collection<ElkAxiom>, ElkEntailmentQueryTestOutput> {
 
 	// @formatter:off
-	static final String[] IGNORE_LIST = {
-			ElkTestUtils.TEST_INPUT_LOCATION + "/query/entailment/HasValueRanges.owl",// Ranges not supported with ObjectHasValue
-		};
+	static final String[] IGNORE_LIST = {};
 	// @formatter:on
 
 	static {

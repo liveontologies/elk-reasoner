@@ -23,7 +23,9 @@
 package org.semanticweb.elk.reasoner.indexing.classes;
 
 import org.semanticweb.elk.RevertibleAction;
+import org.semanticweb.elk.reasoner.completeness.Feature;
 import org.semanticweb.elk.reasoner.indexing.model.IndexedComplexClassExpression;
+import org.semanticweb.elk.reasoner.indexing.model.IndexedIndividual;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedClassExpression;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectProperty;
 import org.semanticweb.elk.reasoner.indexing.model.ModifiableIndexedObjectSomeValuesFrom;
@@ -79,6 +81,20 @@ class ModifiableIndexedObjectSomeValuesFromImpl extends
 						() -> PropagationFromExistentialFillerRule
 								.removeRuleFor(this, index))
 				.then(super.getIndexingAction(index, increment))
+				.then(RevertibleAction.create(() -> {
+					if (getFiller() instanceof IndexedIndividual) {
+						index.occurrenceChanged(
+								Feature.OBJECT_HAS_VALUE_POSITIVE,
+								increment.positiveIncrement);
+					}
+					return true;
+				}, () -> {
+					if (getFiller() instanceof IndexedIndividual) {
+						index.occurrenceChanged(
+								Feature.OBJECT_HAS_VALUE_POSITIVE,
+								-increment.positiveIncrement);
+					}
+				}))
 				.then(RevertibleAction.create(
 						() -> !occursNegatively()
 								&& increment.negativeIncrement < 0,
