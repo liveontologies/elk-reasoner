@@ -42,6 +42,12 @@
 							<locale>en,US</locale>
 						</configuration>
 					</execution>
+					<execution>
+						<id>released-version</id>
+						<goals>
+							<goal>released-version</goal>
+						</goals>
+					</execution>
 				</executions>
 			</plugin>
 			<plugin>
@@ -103,6 +109,26 @@
 						<goals>
 							<goal>resources</goal>
 						</goals>
+					</execution>
+					<!-- filtering and copying of additional files; these will *not* be included in the jar -->
+					<execution>
+						<id>filter-main-resources</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}/../../</outputDirectory>
+							<resources>
+								<resource>
+									<directory>src/main/resources</directory>
+									<filtering>true</filtering>
+									<includes>
+										<include>README.md</include>
+									</includes>
+								</resource>
+							</resources>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
