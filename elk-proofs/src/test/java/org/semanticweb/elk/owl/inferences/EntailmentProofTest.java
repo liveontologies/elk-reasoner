@@ -52,9 +52,7 @@ public class EntailmentProofTest
 		extends BaseQueryTest<ElkAxiom, ElkQueryDerivabilityTestOutput> {
 
 	// @formatter:off
-	static final String[] IGNORE_LIST = {
-			ElkTestUtils.TEST_INPUT_LOCATION + "/query/entailment/AssertionRanges.owl",// Ranges not supported with assertions
-		};
+	static final String[] IGNORE_LIST = {};
 	// @formatter:on
 
 	static {
