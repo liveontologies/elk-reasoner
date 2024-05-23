@@ -8,8 +8,8 @@
 	<packaging>pom</packaging>
 
 	<name>ELK Reasoner</name>
-	<description>A Java-based OWL EL reasoner</description>
-	<url>http://elk.semanticweb.org/</url>
+	<description>A Java-based ontology reasoner for the OWL 2 EL profile.</description>
+	<url>https://github.com/liveontologies/elk-reasoner</url>
 
 	<scm>
 		<connection>scm:git:https://github.com/liveontologies/elk-reasoner.git</connection>
@@ -21,14 +21,14 @@
 	<licenses>
 		<license>
 			<name>The Apache Software License, Version 2.0</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
 
 	<organization>
-		<name>Department of Computer Science, University of Oxford</name>
-		<url>http://www.cs.ox.ac.uk</url>
+		<name>Live Ontologies Project</name>
+		<url>http://liveontologies.org</url>
 	</organization>
 
 	<inceptionYear>2011</inceptionYear>
@@ -37,62 +37,32 @@
 		<developer>
 			<id>yevgeny</id>
 			<name>Yevgeny Kazakov</name>
-			<email>yevgeny.kazakov@uni-ulm.de</email>
-			<organization>Institute of Artificial Intelligence, University of Ulm</organization>
-			<organizationUrl>http://www.uni-ulm.de/en/in/ki.html</organizationUrl>
-			<roles>
-				<role>developer</role>
-			</roles>
-			<timezone>1</timezone>
+			<url>https://github.com/ykazakov</url>
 		</developer>
 		<developer>
 			<id>markus</id>
 			<name>Markus Kroetzsch</name>
-			<email>markus.kroetzsch@cs.ox.ac.uk</email>
-			<organization>Department of Computer Science, University of Oxford</organization>
-			<organizationUrl>http://www.cs.ox.ac.uk</organizationUrl>
-			<roles>
-				<role>developer</role>
-			</roles>
-			<timezone>0</timezone>
+			<url>https://github.com/mkroetzsch</url>
 		</developer>
 		<developer>
 			<id>frantisek</id>
 			<name>Frantisek Simancik</name>
-			<email>frantisek.simancik@cs.ox.ac.uk</email>
-			<organization>Department of Computer Science, University of Oxford</organization>
-			<organizationUrl>http://www.cs.ox.ac.uk</organizationUrl>
-			<roles>
-				<role>developer</role>
-			</roles>
-			<timezone>0</timezone>
+			<url>https://github.com/fsimancik</url>
 		</developer>
 		<developer>
 			<id>pavel</id>
 			<name>Pavel Klinov</name>
-			<email>pavel.klinov@uni-ulm.de</email>
-			<organization>Institute of Artificial Intelligence, University of Ulm</organization>
-			<organizationUrl>http://www.uni-ulm.de/en/in/ki.html</organizationUrl>
-			<roles>
-				<role>developer</role>
-			</roles>
-			<timezone>1</timezone>
+			<url>https://github.com/klinovp</url>
 		</developer>
 		<developer>
 			<id>petesko</id>
 			<name>Peter Skocovsky</name>
-			<email>peter.skocovsky@uni-ulm.de</email>
-			<organization>Institute of Artificial Intelligence, University of Ulm</organization>
-			<organizationUrl>http://www.uni-ulm.de/en/in/ki.html</organizationUrl>
-			<roles>
-				<role>developer</role>
-			</roles>
-			<timezone>1</timezone>
+			<url>https://github.com/aifargonos</url>
 		</developer>
 		<developer>
 			<id>saa</id>
 			<name>Alexander Stupnikov</name>
-			<email>saarus72@gmail.com</email>
+			<url>https://github.com/saarus72</url>
 		</developer>
 	</developers>
 

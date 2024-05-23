@@ -4,7 +4,7 @@ The ELK Reasoner team is pleased to announce
 ELK is an ontology reasoner for the OWL 2 EL profile, currently with some 
 limitations. For further information see
  
-          http://elk.semanticweb.org/
+          https://github.com/liveontologies/elk-reasoner
 
 Changes in this version:
 ------------------------
