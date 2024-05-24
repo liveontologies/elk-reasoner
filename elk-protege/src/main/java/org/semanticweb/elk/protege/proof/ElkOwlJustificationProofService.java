@@ -46,11 +46,6 @@ public class ElkOwlJustificationProofService
 	}
 
 	@Override
-	public String getName() {
-		return "ELK OWL Proof";
-	}
-
-	@Override
 	public Set<OWLAxiom> getJustification(Inference<?> inference) {
 
 		if (Inferences.isAsserted(inference)) {

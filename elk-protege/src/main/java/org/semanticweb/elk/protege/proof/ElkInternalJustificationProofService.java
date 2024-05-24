@@ -48,11 +48,6 @@ public class ElkInternalJustificationProofService
 	}
 
 	@Override
-	public String getName() {
-		return "ELK Internal Proof";
-	}
-
-	@Override
 	public Set<OWLAxiom> getJustification(Inference<?> inference) {
 		return justifier_.getJustification(inference);
 	}
