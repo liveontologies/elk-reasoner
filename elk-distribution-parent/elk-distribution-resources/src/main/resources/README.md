@@ -1,5 +1,5 @@
 # ${project.parent.parent.name}
-![Maven Central Version](https://img.shields.io/maven-central/v/org.liveontologies/${project.parent.parent.artifactId})
+![Maven Central Version](https://img.shields.io/maven-central/v/${project.parent.parent.groupId}/${project.parent.parent.artifactId})
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Build status](https://ci.appveyor.com/api/projects/status/3sv7r52xqm0ja2mi?svg=true)](https://ci.appveyor.com/project/ykazakov/elk-reasoner)
 
