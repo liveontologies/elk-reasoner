@@ -50,7 +50,7 @@ To use the ELK OWL API library, include the following maven dependency to your p
 <dependency>
   <groupId>io.github.liveontologies</groupId>
   <artifactId>elk-owlapi</artifactId>
-  <version>${releasedVersion.version}</version>
+  <version>0.6.0</version>
 </dependency>
 ```
 

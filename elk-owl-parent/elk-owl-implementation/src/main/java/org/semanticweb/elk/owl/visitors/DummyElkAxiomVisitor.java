@@ -85,6 +85,10 @@ public class DummyElkAxiomVisitor<O> implements ElkAxiomVisitor<O> {
 	
 	/**
 	 * Invoked to visit every logical axiom
+	 * 
+	 * @param axiom
+	 *            the logical {@link ElkAxiom} to visit
+	 * @return the visitor output
 	 */
 	protected O defaultLogicalVisit(ElkAxiom axiom) {
 		return defaultVisit(axiom);
@@ -92,6 +96,10 @@ public class DummyElkAxiomVisitor<O> implements ElkAxiomVisitor<O> {
 
 	/**
 	 * Invoked to visit every non-logical (annotation) axiom
+	 *
+	 *  @param axiom
+	 *            the non-logical {@link ElkAxiom} to visit
+	 * @return the visitor output
 	 */
 	protected O defaultNonLogicalVisit(ElkAxiom axiom) {
 		return defaultVisit(axiom);

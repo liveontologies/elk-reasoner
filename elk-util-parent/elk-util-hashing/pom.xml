@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>elk-util-parent</artifactId>
 		<groupId>io.github.liveontologies</groupId>
-		<version>0.6.0-SNAPSHOT</version>
+		<version>0.6.0</version>
 	</parent>
 
 	<artifactId>elk-util-hashing</artifactId>
