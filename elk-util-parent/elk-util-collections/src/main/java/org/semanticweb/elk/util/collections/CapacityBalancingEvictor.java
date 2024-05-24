@@ -147,6 +147,7 @@ public class CapacityBalancingEvictor<E> extends RecencyEvictor<E> {
 		 * If not supplied, defaults to {@link #DEFAULT_BALANCE}.
 		 * 
 		 * @param balance
+		 *            the proportion of elements that should be not evicted
 		 * @return This builder.
 		 * @throws IllegalArgumentException
 		 *             When the argument is not between 0 and 1 inclusive.
@@ -168,6 +169,8 @@ public class CapacityBalancingEvictor<E> extends RecencyEvictor<E> {
 		 * {@link #DEFAULT_BALANCE_AFTER_N_REPEATED_QUERIES}.
 		 * 
 		 * @param balanceAfterNRepeatedQueries
+		 *            the number of repeated queries after which to balance the
+		 *            capacity
 		 * @return This builder.
 		 * @throws IllegalArgumentException
 		 *             If the value is not positive.

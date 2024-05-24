@@ -80,9 +80,17 @@ public abstract class AbstractRuleApplicationFactory<C extends Context, I extend
 
 	/**
 	 * @param activeContext
+	 *            a reference to the {@link Context} that is being processed
 	 * @param inferenceProcessor
+	 *            specifies how the produced {@link ClassInference}s should be
+	 *            processed
 	 * @param saturationStateWriter
+	 *            an object through which the {@link SaturationState} can be
+	 *            updated
+	 * @param localTodo
+	 *            the queue of {@link ClassInference} produced by the worker
 	 * @param localStatistics
+	 *            the {@link SaturationStatistics} for the current worker
 	 * @return an {@link InputProcessor} that processes {@link ClassInference}s
 	 *         in {@link Context}s within an individual worker thread for the
 	 *         input root {@link IndexedClassExpression} using the supplied
@@ -106,7 +114,11 @@ public abstract class AbstractRuleApplicationFactory<C extends Context, I extend
 	 * further extended and optimized.
 	 * 
 	 * @param creationListener
+	 *            the {@link ContextCreationListener} that gets notified when
+	 *            this {@link SaturationStateWriter} creates new contexts
 	 * @param modificationListener
+	 *            the {@link ContextModificationListener} that gets notified
+	 *            when this {@link SaturationStateWriter} modifies contexts
 	 * @return a new writer for the main {@link SaturationState} to be used by
 	 *         engine.
 	 */
@@ -137,10 +149,17 @@ public abstract class AbstractRuleApplicationFactory<C extends Context, I extend
 	 * {@link ClassInference}s within {@link Context} by an individual worker.
 	 * 
 	 * @param activeContext
+	 *            a reference to the {@link Context} that is being processed
 	 * @param ruleVisitor
+	 *            specifies how the produced {@link ClassInference}s should be
+	 *            processed
 	 * @param writer
+	 *            an object through which the {@link SaturationState} can be
 	 * @param localStatistics
-	 * @return
+	 *            the {@link SaturationStatistics} for the current worker
+	 * @return a {@link ClassInference.Visitor} that processes
+	 *         {@link ClassInference}s within {@link Context} by an individual
+	 *         worker.
 	 */
 	protected abstract ClassInference.Visitor<Boolean> getInferenceProcessor(
 			Reference<Context> activeContext, RuleVisitor<?> ruleVisitor,
@@ -148,10 +167,13 @@ public abstract class AbstractRuleApplicationFactory<C extends Context, I extend
 			SaturationStatistics localStatistics);
 
 	/**
-	 * Creates a {@link RuleVisitor} that specifies how the rules are applied 
+	 * Creates a {@link RuleVisitor} that specifies how the rules are applied
 	 * 
 	 * @param statistics
-	 * @return the {@link RuleVisitor} used by this 
+	 *            the {@link SaturationStatistics} that updates information
+	 *            about the visited rules
+	 * @return the {@link RuleVisitor} that updates the given
+	 *         {@link SaturationStatistics}
 	 */
 	@SuppressWarnings("static-method")
 	protected RuleVisitor<?> getRuleVisitor(RuleStatistics statistics) {

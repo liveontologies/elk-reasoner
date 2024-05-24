@@ -104,6 +104,16 @@ public class Reasoner extends AbstractReasonerState {
 	/**
 	 * Constructor. In most cases, Reasoners should be created by the
 	 * {@link ReasonerFactory}.
+	 * 
+	 * @param elkFactory
+	 *            the factory used to create new {@link ElkObject}s
+	 * @param interrupter
+	 *            the object that notifies and propagates the information about
+	 *            interruption
+	 * @param stageExecutor
+	 *            the executor for various stages of the reasoner
+	 * @param config
+	 *            the reasoner configuration
 	 */
 	protected Reasoner(ElkObject.Factory elkFactory,
 			final ReasonerInterrupter interrupter,
@@ -252,6 +262,8 @@ public class Reasoner extends AbstractReasonerState {
 	 *            an {@link ElkClass} for which to find a {@link TaxonomyNode}
 	 * @return the {@link TaxonomyNode} for the given {@link ElkClass}
 	 * 
+	 * @throws ElkException
+	 *             if the result cannot be computed
 	 */
 	protected IncompleteResult<? extends TaxonomyNode<ElkClass>> getTaxonomyNode(
 			ElkClass elkClass) throws ElkException {
@@ -273,6 +285,8 @@ public class Reasoner extends AbstractReasonerState {
 	 * Helper method to get an {@link InstanceNode} from the taxonomy.
 	 * 
 	 * @param elkNamedIndividual
+	 *            a {@link ElkNamedIndividual} for which to find an
+	 *            {@link InstanceNode}
 	 * @return the {@link InstanceNode} for the given {@link ElkNamedIndividual}
 	 * @throws ElkException
 	 *             if the result cannot be computed
@@ -297,6 +311,7 @@ public class Reasoner extends AbstractReasonerState {
 	 * Helper method to get a {@link TypeNode} from the taxonomy.
 	 * 
 	 * @param elkClass
+	 *            an {@link ElkClass} for which to find a {@link TypeNode}
 	 * @return the {@link TypeNode} for the given {@link ElkClass}
 	 * @throws ElkException
 	 *             if the result cannot be computed
@@ -325,6 +340,8 @@ public class Reasoner extends AbstractReasonerState {
 	 *            {@link TaxonomyNode}
 	 * @return the {@link TaxonomyNode} for the given {@link ElkObjectProperty}
 	 * 
+	 * @throws ElkException
+	 *             if the result cannot be computed
 	 */
 	protected IncompleteResult<? extends TaxonomyNode<ElkObjectProperty>> getObjectPropertyTaxonomyNode(
 			final ElkObjectProperty elkProperty) throws ElkException {

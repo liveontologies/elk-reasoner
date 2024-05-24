@@ -44,13 +44,6 @@ public abstract class AbstractTracingInference implements TracingInference {
 	public abstract Conclusion getPremise(int index,
 			Conclusion.Factory factory);
 
-	/**
-	 * @param factory
-	 *            the factory for creating conclusions
-	 * 
-	 * @return the conclusion produced by this inference
-	 */
-
 	protected static <T> T failGetPremise(int index) {
 		throw new IndexOutOfBoundsException("No premise with index: " + index);
 	}

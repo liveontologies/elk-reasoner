@@ -45,7 +45,10 @@ public class DefaultEntailmentInferenceVisitor<O>
 
 	/**
 	 * NO-OP default visitor
-	 * @param entailmentInference  
+	 * 
+	 * @param entailmentInference
+	 *            the visited {@link EntailmentInference}
+	 * @return the visitor output ({@code null} by default)
 	 */
 	protected O defaultVisit(final EntailmentInference entailmentInference) {
 		return null;

@@ -48,7 +48,8 @@ public class DummyObjectPropertyConclusionVisitor<O>
 	 * The default implementation of all methods
 	 * 
 	 * @param conclusion
-	 * @return
+	 *            the visited {@link ObjectPropertyConclusion}
+	 * @return the output of the visitor
 	 */
 	protected O defaultVisit(ObjectPropertyConclusion conclusion) {
 		return null;

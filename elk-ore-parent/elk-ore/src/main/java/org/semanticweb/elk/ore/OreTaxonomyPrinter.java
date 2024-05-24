@@ -158,9 +158,13 @@ public class OreTaxonomyPrinter {
 	 * Prints class declarations
 	 * 
 	 * @param classTaxonomy
+	 *            the class taxonomy from which to take the printed classes
 	 * @param objectFactory
+	 *            {@link ElkObject.Factory} to create the declaration axioms
 	 * @param writer
+	 *            the writer to print to
 	 * @throws IOException
+	 *             if an I/O error occurs
 	 */
 	protected static void printDeclarations(Taxonomy<ElkClass> classTaxonomy,
 			ElkObject.Factory objectFactory, Appendable writer)

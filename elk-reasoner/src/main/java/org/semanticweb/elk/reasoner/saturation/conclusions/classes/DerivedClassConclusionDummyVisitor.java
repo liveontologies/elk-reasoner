@@ -44,6 +44,7 @@ public class DerivedClassConclusionDummyVisitor
 	 * The default visitor method for conclusions explaining a subsumption
 	 * 
 	 * @param conclusion
+	 *            the visited {@link ClassConclusion}
 	 * @return {@code true} if other conclusions should be visited and
 	 *         {@code false} otherwise
 	 * 

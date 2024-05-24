@@ -45,7 +45,9 @@ public class DummySubClassConclusionVisitor<O>
 	 * The default implementation of all methods
 	 * 
 	 * @param subConclusion
-	 * @return
+	 *            the visited {@link SubClassConclusion}
+	 * 
+	 * @return the output of the visitor
 	 */
 	protected O defaultVisit(SubClassConclusion subConclusion) {
 		return null;

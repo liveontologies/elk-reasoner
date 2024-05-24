@@ -51,7 +51,8 @@ public class DummyClassConclusionVisitor<O>
 	 * The default implementation of all methods
 	 * 
 	 * @param conclusion
-	 * @return
+	 *            the visited {@link ClassConclusion}
+	 * @return the output of the visitor
 	 */
 	protected O defaultVisit(ClassConclusion conclusion) {
 		return null;

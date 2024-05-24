@@ -45,7 +45,8 @@ public class DummyClassInferenceVisitor<O>
 
 	/**
 	 * @param inference
-	 * @return {@code null} by default; should be overridden in sub-classes
+	 *            the visited {@link ClassInference}
+	 * @return the output of the visitor ({@code null} by default)
 	 */
 	protected O defaultVisit(ClassInference inference) {
 		return null;

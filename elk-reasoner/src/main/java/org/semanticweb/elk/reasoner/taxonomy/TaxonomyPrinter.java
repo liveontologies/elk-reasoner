@@ -200,6 +200,9 @@ public class TaxonomyPrinter {
 	 * @param writer
 	 *            the {@link Writer} used for printing
 	 * @throws IOException
+	 *             If an I/O error occurs
+	 * @param <T>
+	 *            the type of objects stored in the {@link Taxonomy}
 	 */
 	protected static <T extends ElkEntity> void processTaxomomy(
 			final Taxonomy<T> taxonomy, final Appendable writer)
@@ -258,7 +261,7 @@ public class TaxonomyPrinter {
 		}
 	}
 
-	protected static <T extends ElkEntity> void printDeclarations(
+	private static <T extends ElkEntity> void printDeclarations(
 			final Iterable<T> members, final ElkObject.Factory factory,
 			final Appendable writer) throws IOException {
 		for (final T member : members) {
@@ -273,8 +276,9 @@ public class TaxonomyPrinter {
 	 * relevant related members are given in two ordered collections of
 	 * equivalent members and super-members, respectively. The method serializes
 	 * the axioms to the Writer.
+	 * 
 	 */
-	protected static <T extends ElkEntity, I extends ElkEntity> void printMemberAxioms(
+	private static <T extends ElkEntity, I extends ElkEntity> void printMemberAxioms(
 			final I member, final List<I> equivalentMembers,
 			final SortedSet<T> directSuperMembers, final Taxonomy<T> taxonomy,
 			final ElkObject.Factory factory, final Appendable writer)

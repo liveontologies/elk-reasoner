@@ -176,7 +176,9 @@ public class NQEvictor<E> extends AbstractEvictor<E> {
 		 * {@link RecencyEvictor}.
 		 * 
 		 * @param capacity
+		 *            the capacity of the added level
 		 * @param loadFactor
+		 *            the load factor of the added level
 		 * @return This builder.
 		 * @throws IllegalArgumentException
 		 *             When capacity is negative or load factor is not between 0
@@ -203,6 +205,7 @@ public class NQEvictor<E> extends AbstractEvictor<E> {
 		 * if the level was a {@link RecencyEvictor}.
 		 * 
 		 * @param capacity
+		 *            the capacity of the added level
 		 * @return This builder.
 		 * @throws IllegalArgumentException
 		 *             When capacity is negative.
@@ -217,6 +220,7 @@ public class NQEvictor<E> extends AbstractEvictor<E> {
 		 * the level was a {@link RecencyEvictor}.
 		 * 
 		 * @param loadFactor
+		 *            the load factor of the added level
 		 * @return This builder.
 		 * @throws IllegalArgumentException
 		 *             When load factor is not between 0 and 1 inclusive.
@@ -241,6 +245,9 @@ public class NQEvictor<E> extends AbstractEvictor<E> {
 		 * Builds the {@link NQEvictor} with the added levels. If none were
 		 * added, builds {@link NQEvictor} with one level with default capacity
 		 * and load factor.
+		 * 
+		 * @param <E>
+		 *            The type of the elements maintained by the evictor.
 		 * 
 		 * @return The built {@link NQEvictor}
 		 */

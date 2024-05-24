@@ -99,6 +99,8 @@ public class CountingEvictor<E> extends RecencyEvictor<E> {
 		 * If not provided, defaults to {@link #DEFAULT_EVICT_BEFORE_ADD_COUNT}.
 		 * 
 		 * @param evictBeforeAddCount
+		 *            The number of times an element must be added so that it is
+		 *            not evicted immediately.
 		 * @return This builder.
 		 * @throws IllegalArgumentException
 		 *             When the argument is negative.

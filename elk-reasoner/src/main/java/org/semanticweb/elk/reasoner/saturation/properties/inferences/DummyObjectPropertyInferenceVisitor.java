@@ -45,7 +45,8 @@ public class DummyObjectPropertyInferenceVisitor<O>
 	 * The default implementation of all methods
 	 * 
 	 * @param inference
-	 * @return
+	 *            the visited {@link ObjectPropertyInference}
+	 * @return the output of the visitor
 	 */
 	protected O defaultTracedVisit(ObjectPropertyInference inference) {
 		return null;
