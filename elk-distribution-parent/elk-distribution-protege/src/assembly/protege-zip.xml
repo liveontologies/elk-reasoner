@@ -32,6 +32,7 @@
 			<useStrictFiltering>true</useStrictFiltering>
 			<!-- don't include the artifact for this project -->
 			<useProjectArtifact>false</useProjectArtifact>
+			<outputFileNameMapping>${protege.pluginId}-${artifact.version}.${artifact.extension}</outputFileNameMapping>
 		</dependencySet>
 	</dependencySets>
 </assembly>
