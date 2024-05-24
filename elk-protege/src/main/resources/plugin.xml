@@ -13,7 +13,7 @@
 </extension>
 
 <extension id="elk.proofs" point="org.liveontologies.protege.explanation.proof.service">
-   <name value="ELK"/>
+   <name value="ELK ${project.version}"/>
    <class value="org.semanticweb.elk.protege.proof.ElkProofService"/>
 </extension>
 
@@ -23,12 +23,12 @@
 </extension>
 
 <extension id="elk.prover" point="io.github.liveontologies.protege.justification.proof.JustificationProofService">
-   <name value="ELK OWL Proof Service"/>
+   <name value="ELK ${project.version} OWL Proof Service"/>
    <class value="org.semanticweb.elk.protege.proof.ElkOwlJustificationProofService"/>
 </extension>
 
 <extension id="elk.prover" point="io.github.liveontologies.protege.justification.proof.JustificationProofService">
-   <name value="ELK Internal Proof Service"/>
+   <name value="ELK ${project.version} Internal Proof Service"/>
    <class value="org.semanticweb.elk.protege.proof.ElkInternalJustificationProofService"/>
 </extension>
 
