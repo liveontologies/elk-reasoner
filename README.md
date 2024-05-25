@@ -1,5 +1,5 @@
 # ELK Reasoner
-![Maven Central Version](https://img.shields.io/maven-central/v/io.github.liveontologies/elk-parent)
+[![Maven Central Version](https://img.shields.io/maven-central/v/io.github.liveontologies/elk-parent)](https://search.maven.org/artifact/io.github.liveontologies/elk-parent/0.6.0/pom)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Build status](https://ci.appveyor.com/api/projects/status/3sv7r52xqm0ja2mi?svg=true)](https://ci.appveyor.com/project/ykazakov/elk-reasoner)
 
@@ -34,7 +34,7 @@ ELK is provided in several [distribution packages](https://github.com/liveontolo
 
 ### Stand-alone application
 
-A stand-alone command-line Java application can perform selected reasoning tasks with a given ontology. E.g., the following command classifies the [Pizza ontology](https://protege.stanford.edu/ontologies/pizza/pizza.owl) and saves the result in another file:
+A stand-alone command-line [Java application](https://search.maven.org/remote_content?g=io.github.liveontologies&a=elk-distribution-cli&v=0.6.0&e=zip) can perform selected reasoning tasks with a given ontology. E.g., the following command classifies the [Pizza ontology](https://protege.stanford.edu/ontologies/pizza/pizza.owl) and saves the result in another file:
     
 ```
 java -jar elk.jar -i pizza.owl -c -o pizza-taxonomy.owl
@@ -42,7 +42,7 @@ java -jar elk.jar -i pizza.owl -c -o pizza-taxonomy.owl
 
 ### OWL API
 
-A library for the [OWL API](https://owlcs.github.io/owlapi/) implementing the [OWLReasoner interface](https://owlcs.github.io/owlapi/apidocs_5/org/semanticweb/owlapi/reasoner/OWLReasoner.html).
+A [library](https://search.maven.org/remote_content?g=io.github.liveontologies&a=elk-distribution-owlapi&v=0.6.0&e=zip) for the [OWL API](https://owlcs.github.io/owlapi/) implementing the [OWLReasoner interface](https://owlcs.github.io/owlapi/apidocs_5/org/semanticweb/owlapi/reasoner/OWLReasoner.html).
 See an example how to [perform queries using an OWL reasoner](https://github.com/owlcs/owlapi/wiki/DL-Queries-with-a-real-reasoner). Both versions 4.x and 5.x of OWL API are currently supported.
 To use the ELK OWL API library, include the following maven dependency to your project:
 
@@ -56,7 +56,7 @@ To use the ELK OWL API library, include the following maven dependency to your p
 
 ### Protégé
 
-We provide a reasoner plug-in for the [Protégé Desktop](https://protege.stanford.edu) ontology editor, which can be installed from within the editor.
+We provide a [reasoner plug-in](https://search.maven.org/remote_content?g=io.github.liveontologies&a=elk-distribution-protege&v=0.6.0&e=zip) for the [Protégé Desktop](https://protege.stanford.edu) ontology editor, which can be installed from within the editor.
 See the [general documentation](https://protegeproject.github.io/protege/) about how to work with ontologies and use reasoners in Protégé.
 
 ## License
