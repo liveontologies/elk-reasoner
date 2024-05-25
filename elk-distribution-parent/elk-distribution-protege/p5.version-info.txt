@@ -8,48 +8,7 @@ limitations. For further information see
 
 Changes in this version:
 ------------------------
-New features:
-- Compute internal inferences for derived conclusions by repeating rule applications (tracing). 
-- Initial translation of internal ELK inferences to OWL inferences. 
-- Protege: new auto-synchronization option to update reasoning result immediately after changes. 
-- Partial support of ObjectOneOf constructor. 
-- Support of SameIndividual and DifferentIndividuals axioms. 
-- Partial support of DisjointUnion axioms. 
-- Partial support of ObjectPropertyRange axioms. 
-- Support entailment checking for ClassAssertion, DifferentIndividuals, DisjointClasses, EquivalentClasses, ObjectPropertyAssertion, ObjectPropertyDomain, SameIndividual and SubClassOf axioms. 
-- Implement extension points for the protege-proof-explanation plugin. 
-- Implement extension points for the protege-proof-justification plugin. 
-- Keep track of features that cause incompleteness of reasoning results. 
-- Support positive occurrences of ObjectHasSelf. 
-- Support OWL API 5.x.  Issue: 48. 
-Fixed Bugs:
-- Parse DataOneOf with one literal by functional-style parser.  Issue: 43. 
-- Fix NumberFormatException when returning reasoner version.  Issue: 49. 
-- Restore equality detection of some unsupported constructors.  Issue: 61. 
-Changes:
-- Avoid performing some redundant role chain rule applications. 
-- Ensure that the set of derived conclusions does not depend on the order of rule applications. 
-- Make index updates revertable to better handle unsupported language features. 
-- Represent all OWL object types in internal OWL object model. 
-- Improve the transitive reduction algorithm for taxonomy construction. 
-- Protege: store preferences in Java preferences instead of a file. 
-- Make taxonomy model more generic. 
-- Convert internal inferences to OWL inferences using a recursive matching procedure. 
-- Implement answering class expression and instance queries without introducing auxiliary classes. 
-- Extend proof generation to entailment checking. 
-- Add an option to inline proofs by combining nested inferences. 
-- Add examples to inferences used in proofs. 
-- Centralize interrupt management for all reasoning stages. 
-- Share concurrent executor over all reasoner instances. 
-- Implement recency and frequency caching policies. 
-- Cache query results and proof inferences. 
-- Improve reporting of incompleteness warnings and their explanations. 
-- Improve incremental reasoning by avoiding re-computations after deletions.  Issue: 28. 
-- Switch from log4j to logback. 
-Removed:
-- Protege: incremental mode is no longer experimental. 
-- Drop support of Java 7. 
-- Protege: remove popup notifications about unsupported reasoning tasks and incompleteness. 
+No detail
 
 
 Have fun!
