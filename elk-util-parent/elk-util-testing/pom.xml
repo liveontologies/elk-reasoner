@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>io.github.liveontologies</groupId>
 		<artifactId>elk-util-parent</artifactId>
-		<version>0.6.0</version>
+		<version>0.6.1-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>elk-util-testing</artifactId>
