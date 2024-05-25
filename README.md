@@ -11,7 +11,7 @@ For a detailed information, see the [project wiki](https://github.com/liveontolo
 
 ELK is an [ontology reasoner](https://en.wikipedia.org/wiki/Semantic_reasoner) implementing a polynomial-time goal-directed [consequence-based procedure](https://doi.org/10.1007/s10817-013-9296-3) for a fragment of [OWL 2 EL](https://www.w3.org/TR/owl2-profiles/#OWL_2_EL).
 
-It is distinguishing features include:
+Its distinguishing features include:
 
 #### Concurrent computation: 
 	

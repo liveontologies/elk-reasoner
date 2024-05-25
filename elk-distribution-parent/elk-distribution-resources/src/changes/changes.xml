@@ -29,7 +29,7 @@ will appear in the produced result.
 				Ensure that the set of derived conclusions does not depend on the order of rule applications.				
 			</action>
 			<action dev="yevgeny" type="update">
-				Make index updates revertable to better handle unsupported language features.				
+				Make index updates revertible to better handle unsupported language features.				
 			</action>
 			<action dev="yevgeny" type="update">
 				Represent all OWL object types in internal OWL object model.				
