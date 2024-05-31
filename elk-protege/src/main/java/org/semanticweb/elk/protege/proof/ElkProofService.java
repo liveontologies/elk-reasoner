@@ -38,8 +38,6 @@ import org.semanticweb.elk.owlapi.ElkReasoner;
 import org.semanticweb.elk.owlapi.proofs.ElkOwlProof;
 import org.semanticweb.elk.protege.ElkPreferences;
 import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapi.model.OWLEquivalentClassesAxiom;
-import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.UnsupportedEntailmentTypeException;
 
@@ -64,8 +62,8 @@ public class ElkProofService extends ProofService
 
 	@Override
 	public boolean hasProof(OWLAxiom entailment) {
-		return (reasoner_ != null && entailment instanceof OWLSubClassOfAxiom
-				|| entailment instanceof OWLEquivalentClassesAxiom);
+		return reasoner_ != null && reasoner_
+				.isEntailmentCheckingSupported(entailment.getAxiomType());
 	}
 
 	@Override

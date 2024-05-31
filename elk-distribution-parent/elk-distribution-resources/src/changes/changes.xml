@@ -16,7 +16,9 @@ will appear in the produced result.
 	</properties>
 	<body>
 		<release version="${release.version}" date="${buildDate}" description="Changes since the last release">
-			
+			<action dev="yevgeny" type="fix">
+				Proof explanations should provide proofs for every supported axiom type.				
+			</action>
 		</release>	
 	    <release version="0.6.0" date="2024-05-24" description="Explanation generation">
 			<action dev="pavel" type="add">

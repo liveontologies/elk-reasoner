@@ -8,7 +8,8 @@ limitations. For further information see
 
 Changes in this version:
 ------------------------
-No detail
+Fixed Bugs:
+- Proof explanations should provide proofs for every supported axiom type. 
 
 
 Have fun!
