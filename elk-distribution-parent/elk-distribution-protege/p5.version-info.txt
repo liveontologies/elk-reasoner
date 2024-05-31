@@ -10,6 +10,8 @@ Changes in this version:
 ------------------------
 Fixed Bugs:
 - Proof explanations should provide proofs for every supported axiom type. 
+Changes:
+- The default log level of elk-cli is set to WARN. 
 
 
 Have fun!

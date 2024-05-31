@@ -19,6 +19,9 @@ will appear in the produced result.
 			<action dev="yevgeny" type="fix">
 				Proof explanations should provide proofs for every supported axiom type.				
 			</action>
+			<action dev="yevgeny" type="update">
+				The default log level of elk-cli is set to WARN.				
+			</action>
 		</release>	
 	    <release version="0.6.0" date="2024-05-24" description="Explanation generation">
 			<action dev="pavel" type="add">

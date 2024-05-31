@@ -101,7 +101,7 @@ public class Main {
 				.withRequiredArg().ofType(Integer.class);
 		OptionSpec<String> logging = parser
 				.acceptsAll(asList("logging", "l"),
-						"logging level; default INFO")
+						"logging level; default WARN")
 				.withRequiredArg().ofType(String.class).describedAs("level");
 		OptionSpec<Void> verbose = parser.acceptsAll(asList("verbose", "v"),
 				"equivalent to --logging=DEBUG");
@@ -144,20 +144,23 @@ public class Main {
 			System.err.println("Cannot set more than one logging level!");
 			return;
 		}
+		
+		Level level = Level.WARN;
+		if (options.has(logging))
+			level = Level.toLevel(options.valueOf(logging), level);
+		if (options.has(verbose))
+			level = Level.DEBUG;
+		if (options.has(Verbose))
+			level = Level.TRACE;
+		if (options.has(quiet))
+			level = Level.ERROR;
+		
 		// SLF4J does not allow setting the logging level; we use a concrete
 		// binding
 		ch.qos.logback.classic.Logger allLoggers = (ch.qos.logback.classic.Logger) LoggerFactory
 				.getLogger("org.semanticweb.elk");
-
-		if (options.has(logging))
-			allLoggers.setLevel(
-					Level.toLevel(options.valueOf(logging), Level.INFO));
-		if (options.has(verbose))
-			allLoggers.setLevel(Level.DEBUG);
-		if (options.has(Verbose))
-			allLoggers.setLevel(Level.TRACE);
-		if (options.has(quiet))
-			allLoggers.setLevel(Level.ERROR);
+		
+		allLoggers.setLevel(level);
 
 		// number of workers
 		ReasonerConfiguration configuration = ReasonerConfiguration
