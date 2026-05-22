@@ -477,7 +477,8 @@ public class Reasoner extends AbstractReasonerState {
 				(taxonomy, subNodes) -> {
 					return subNodes.stream()
 							.map(n -> taxonomy.getNode(n.getCanonicalMember()))
-							.flatMap(n -> n.getAllSubNodes().stream())
+							.flatMap(n -> Stream.concat(Stream.of(n),
+									n.getAllSubNodes().stream()))
 							.collect(Collectors.toSet());
 				});
 
@@ -556,7 +557,8 @@ public class Reasoner extends AbstractReasonerState {
 				(taxonomy, superNodes) -> {
 					return superNodes.stream()
 							.map(n -> taxonomy.getNode(n.getCanonicalMember()))
-							.flatMap(n -> n.getAllSuperNodes().stream())
+							.flatMap(n -> Stream.concat(Stream.of(n),
+									n.getAllSuperNodes().stream()))
 							.collect(Collectors.toSet());
 				});
 
