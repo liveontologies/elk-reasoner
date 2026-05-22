@@ -26,6 +26,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -36,6 +37,7 @@ import org.semanticweb.elk.owl.interfaces.ElkClassExpression;
 import org.semanticweb.elk.owl.interfaces.ElkObject;
 import org.semanticweb.elk.owl.interfaces.ElkObjectProperty;
 import org.semanticweb.elk.owl.iris.ElkFullIri;
+import org.semanticweb.elk.owl.iris.ElkIri;
 import org.semanticweb.elk.owl.managers.ElkObjectEntityRecyclingFactory;
 import org.semanticweb.elk.reasoner.completeness.TestIncompleteness;
 import org.semanticweb.elk.reasoner.taxonomy.model.Node;
@@ -158,6 +160,88 @@ public class ComplexClassQueryTest {
 			assertEquals(1, node.size());
 			assertTrue(node.contains(A) != node.contains(B));
 		}
+	}
+
+	/**
+	 * Reproduces Issue 70: for a complex (anonymous) class expression, the
+	 * direct subclasses must also be included among all (indirect) subclasses.
+	 * Before the fix, requesting all subclasses dropped the direct ones.
+	 *
+	 * @throws ElkException
+	 */
+	@Test
+	public void testAllSubClassesIncludeDirectComplex() throws ElkException {
+		final ElkClass B = objectFactory.getClass(new ElkFullIri(":B"));
+		final ElkClass D = objectFactory.getClass(new ElkFullIri(":D"));
+		final ElkClass E = objectFactory.getClass(new ElkFullIri(":E"));
+		final ElkObjectProperty R = objectFactory
+				.getObjectProperty(new ElkFullIri(":R"));
+		// D is a subclass of (R some B), and E is a subclass of D, so D is a
+		// direct subclass of the query and E is an indirect one.
+		final ElkClassExpression query = objectFactory.getObjectSomeValuesFrom(R,
+				B);
+		loader.add(objectFactory.getSubClassOfAxiom(D, query));
+		loader.add(objectFactory.getSubClassOfAxiom(E, D));
+
+		// compare by canonical-member IRI, since direct results (from the query
+		// state) and all results (from the taxonomy) may use different Node and
+		// ElkClass instances for the same class
+		final Set<ElkIri> directIris = getSubClasses(query, true).stream()
+				.map(n -> n.getCanonicalMember().getIri())
+				.collect(Collectors.toSet());
+		final Set<ElkIri> allIris = getSubClasses(query, false).stream()
+				.map(n -> n.getCanonicalMember().getIri())
+				.collect(Collectors.toSet());
+
+		assertTrue("D should be a direct subclass",
+				directIris.contains(D.getIri()));
+		assertTrue("all subclasses must include the direct subclasses",
+				allIris.containsAll(directIris));
+		assertTrue("D should be among all subclasses",
+				allIris.contains(D.getIri()));
+		assertTrue("E should be among all subclasses",
+				allIris.contains(E.getIri()));
+	}
+
+	/**
+	 * Reproduces Issue 70 for superclasses: for a complex (anonymous) class
+	 * expression, the direct superclasses must also be included among all
+	 * (indirect) superclasses.
+	 *
+	 * @throws ElkException
+	 */
+	@Test
+	public void testAllSuperClassesIncludeDirectComplex() throws ElkException {
+		final ElkClass A = objectFactory.getClass(new ElkFullIri(":A"));
+		final ElkClass F = objectFactory.getClass(new ElkFullIri(":F"));
+		final ElkClass G = objectFactory.getClass(new ElkFullIri(":G"));
+		final ElkObjectProperty R = objectFactory
+				.getObjectProperty(new ElkFullIri(":R"));
+		// (R some A) is a subclass of F, and F is a subclass of G, so F is a
+		// direct superclass of the query and G is an indirect one.
+		final ElkClassExpression query = objectFactory.getObjectSomeValuesFrom(R,
+				A);
+		loader.add(objectFactory.getSubClassOfAxiom(query, F));
+		loader.add(objectFactory.getSubClassOfAxiom(F, G));
+
+		// compare by canonical-member IRI, since direct results (from the query
+		// state) and all results (from the taxonomy) may use different Node and
+		// ElkClass instances for the same class
+		final Set<ElkIri> directIris = getSuperClasses(query, true).stream()
+				.map(n -> n.getCanonicalMember().getIri())
+				.collect(Collectors.toSet());
+		final Set<ElkIri> allIris = getSuperClasses(query, false).stream()
+				.map(n -> n.getCanonicalMember().getIri())
+				.collect(Collectors.toSet());
+
+		assertTrue("F should be a direct superclass",
+				directIris.contains(F.getIri()));
+		assertTrue("all superclasses must include the direct superclasses",
+				allIris.containsAll(directIris));
+		assertTrue("F should be among all superclasses",
+				allIris.contains(F.getIri()));
+		assertTrue("G should be among all superclasses",
+				allIris.contains(G.getIri()));
 	}
 
 	boolean isSatisfiable(ElkClassExpression expression) throws ElkException {
