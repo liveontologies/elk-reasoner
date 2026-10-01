@@ -17,10 +17,10 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<!-- Protege requires Java 8 -->
+		<!-- Keep the plug-in compatible with Java 8 -->
 		<java.required.version>8</java.required.version>
-		<protege.lower.version>5</protege.lower.version>
-		<protege.upper.version>6</protege.upper.version>
+		<protege.lower.version>6</protege.lower.version>
+		<protege.upper.version>7</protege.upper.version>
 	</properties>
 
 	<dependencyManagement>
@@ -330,7 +330,7 @@
 						<Embed-Dependency>*;scope=provided;inline=true</Embed-Dependency>
 						<Embed-Transitive>true</Embed-Transitive>
 						<Embed-StripGroup>true</Embed-StripGroup>
-						<Update-Url>${protege.update.url}/p5.update.properties</Update-Url>
+						<Update-Url>${protege.update.url}/p6.update.properties</Update-Url>
 					</instructions>
 				</configuration>
 			</plugin>
